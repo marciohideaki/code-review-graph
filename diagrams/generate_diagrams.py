@@ -377,7 +377,7 @@ def d4():
     y4 = 380
     els.append(R(sx, y4, sw, sh+10, bg=GRN_BG, fs="solid", sc=GRN))
     els.append(TC(step_cx, y4+8, "Re-parse 5 files", 20, sc=GRN))
-    els.append(TC(step_cx, y4+35, "Graph updated \u2713", 14, sc=GRN))
+    els.append(TC(step_cx, y4+35, "Graph updated", 14, sc=GRN))
     # Badge
     els.append(R(sx+sw+18, y4+8, 140, 42, bg=GRN_BG, fs="solid", sc=GRN))
     els.append(TC(sx+sw+88, y4+17, "< 2 seconds", 17, sc=GRN))
@@ -412,13 +412,13 @@ def d5():
     # 3 repo cards
     cards = [
         {"name":"gin",     "files":"99 files",      "red":"16.4\u00d7",
-         "tok":"21,972 \u2192 1,153 tokens",
+         "tok":"21,972 to 1,153 tokens",
          "c":BLU, "bg":BLU_BG},
         {"name":"flask",   "files":"83 files",      "red":"9.1\u00d7",
-         "tok":"44,751 \u2192 4,252 tokens",
+         "tok":"44,751 to 4,252 tokens",
          "c":ORG, "bg":ORG_BG},
         {"name":"fastapi", "files":"1,122 files",   "red":"8.1\u00d7",
-         "tok":"4,944 \u2192 614 tokens",
+         "tok":"4,944 to 614 tokens",
          "c":GRN, "bg":GRN_BG},
     ]
     cw, ch = 370, 200
@@ -474,8 +474,8 @@ def d6():
     els.append(R(fx, fy, fw, fh, bg=PRP_BG, fs="solid", sc=PRP))
     fcx = fx + fw/2
     els.append(TC(fcx, fy+25,  "code-review-graph", 17, sc=PRP))
-    els.append(TC(fcx, fy+65,  "parse \u2192", 13, sc=PRP, op=70))
-    els.append(TC(fcx, fy+85,  "graph \u2192", 13, sc=PRP, op=70))
+    els.append(TC(fcx, fy+65,  "parse", 13, sc=PRP, op=70))
+    els.append(TC(fcx, fy+85,  "graph", 13, sc=PRP, op=70))
     els.append(TC(fcx, fy+105, "blast radius", 13, sc=PRP, op=70))
 
     # Arrow into funnel

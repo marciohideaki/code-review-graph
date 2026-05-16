@@ -107,7 +107,7 @@ On every git commit or file save, a hook fires. The graph diffs changed files, f
 Large monorepos are where token waste is most painful. The graph cuts through the noise: 27,700+ files excluded from review context, with only about 15 files read.
 
 <p align="center">
-  <img src="diagrams/diagram6_monorepo_funnel.png" alt="Next.js monorepo: 27,732 files funnelled through code-review-graph down to about 15 files, 49x fewer tokens" width="80%" />
+  <img src="diagrams/diagram6_monorepo_funnel.png" alt="Next.js monorepo: 98 files funnelled through code-review-graph down to about 3 files, 8.0x fewer tokens" width="80%" />
 </p>
 
 ### 35 language labels across 56 extensions
@@ -121,7 +121,7 @@ Full parser support covers 35 language labels across 56 extensions: Bash, C, C++
 ## Benchmarks
 
 <p align="center">
-  <img src="diagrams/diagram5_benchmark_board.png" alt="Benchmarks across real repos: 4.9x to 27.3x fewer tokens, higher review quality" width="85%" />
+  <img src="diagrams/diagram5_benchmark_board.png" alt="Benchmarks across real repos: 6.9x to 16.4x fewer tokens, 100% recall and 0.54 F1 on impact detection" width="85%" />
 </p>
 
 All numbers come from the automated evaluation runner against 6 real open-source repositories (13 commits total). Reproduce with `code-review-graph eval --all`. Raw data in [`evaluate/reports/summary.md`](evaluate/reports/summary.md).

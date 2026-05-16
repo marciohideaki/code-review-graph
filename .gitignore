@@ -60,6 +60,7 @@ htmlcov/
 
 # Excalidraw source files (PNGs are tracked, sources are not)
 *.excalidraw
+!diagrams/*.excalidraw
 diagrams/export_pngs.mjs
 
 # Evaluation (generated output — test repos, results, reports)
