@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Generate 6 Excalidraw diagrams for code-review-graph Medium article.
+"""Generate Excalidraw diagrams for code-review-graph documentation.
 
-All statistics match repo benchmarks exactly. No invented features or numbers.
+Statistics are sourced from the repository and benchmark reports.
 """
 
 import json
@@ -119,9 +119,9 @@ def d1():
     # ── LEFT: Without Graph ──
     els.append(TC(LC, 85, "Without Graph", 28, sc=RED))
 
-    # Claude Code box
+    # Assistant box
     els.append(R(295, 140, 250, 48, bg=GRY_BG, fs="solid"))
-    els.append(TC(LC, 150, "Claude Code", 20))
+    els.append(TC(LC, 150, "AI assistant", 20))
 
     # Arrow + label
     els.append(A(LC, 195, [[0,0],[0,55]], sc=RED))
@@ -150,9 +150,9 @@ def d1():
     # ── RIGHT: With Graph ──
     els.append(TC(RC, 85, "With Graph", 28, sc=GRN))
 
-    # Claude Code box
+    # Assistant box
     els.append(R(1295, 140, 250, 48, bg=GRY_BG, fs="solid"))
-    els.append(TC(RC, 150, "Claude Code", 20))
+    els.append(TC(RC, 150, "AI assistant", 20))
 
     # Arrow + label
     els.append(A(RC, 195, [[0,0],[0,40]], sc=GRN))
@@ -202,7 +202,7 @@ def d2():
 
     boxes = [
         ("Repository",       "your code",              BLU_BG, BLU, 60),
-        ("Tree-sitter Parser","19 languages + notebooks", ORG_BG, ORG, 380),
+        ("Tree-sitter Parser","35 labels / 56 extensions", ORG_BG, ORG, 380),
         ("SQLite Graph",     "nodes + edges\nflows + communities",  PRP_BG, PRP, 700),
         ("Blast Radius",     "BFS traversal",           YLW_BG, YLW, 1020),
         ("Minimal Review Set","only what matters",        GRN_BG, GRN, 1380),
@@ -513,7 +513,7 @@ def d6():
 # ════════════════════════════════════════════
 def d7():
     els = []
-    els.append(TC(700, 20, "How Claude Code Uses the Graph", 36))
+    els.append(TC(700, 20, "How AI Assistants Use the Graph", 36))
 
     # ── Step boxes (vertical flow) ──
     bw, bh = 320, 65
@@ -528,16 +528,16 @@ def d7():
 
     els.append(A(sx+bw/2, y+bh+5, [[0,0],[0,30]], sc=GRY))
 
-    # Step 2: Claude Code
+    # Step 2: AI assistant
     y = 200
     els.append(R(sx, y, bw, bh, bg=PRP_BG, fs="solid", sc=PRP))
-    els.append(TC(sx+bw/2, y+10, "Claude Code", 22, sc=PRP))
+    els.append(TC(sx+bw/2, y+10, "AI assistant", 22, sc=PRP))
     els.append(TC(sx+bw/2, y+38, "checks MCP tools", 14, sc=GRY))
 
-    # Right annotation: what Claude looks for
+    # Right annotation: what the assistant looks for
     els.append(R(rx, y-5, 380, 75, bg="#f8f9fa", fs="solid", sc=GRY, op=60))
-    els.append(T(rx+15, y+5, "Skills tell Claude:", 14, sc=GRY))
-    els.append(T(rx+15, y+25, '"Use get_review_context before\n scanning files manually"', 13, sc=PRP))
+    els.append(T(rx+15, y+5, "Instructions say:", 14, sc=GRY))
+    els.append(T(rx+15, y+25, '"Use get_review_context_tool before\n scanning files manually"', 13, sc=PRP))
 
     els.append(A(sx+bw/2, y+bh+5, [[0,0],[0,30]], sc=PRP))
 
@@ -549,8 +549,8 @@ def d7():
 
     # Right annotation: what gets called
     els.append(R(rx, y-5, 380, 75, bg="#fff4e6", fs="solid", sc=ORG, op=60))
-    els.append(T(rx+15, y+5, "22 tools available:", 14, sc=ORG))
-    els.append(T(rx+15, y+25, "detect_changes \u2192 get_review_context\n\u2192 get_impact_radius \u2192 query_graph", 13, sc=ORG))
+    els.append(T(rx+15, y+5, "30 tools available:", 14, sc=ORG))
+    els.append(T(rx+15, y+25, "detect_changes_tool, get_review_context_tool\nget_impact_radius_tool, query_graph_tool", 13, sc=ORG))
 
     els.append(A(sx+bw/2, y+bh+5, [[0,0],[0,30]], sc=ORG))
 
@@ -566,7 +566,7 @@ def d7():
 
     els.append(A(sx+bw/2, y+65+5, [[0,0],[0,30]], sc=GRN))
 
-    # Step 5: Claude responds
+    # Step 5: assistant responds
     y = 530
     els.append(R(sx, y, bw, bh, bg=GRN_BG, fs="solid", sc=GRN))
     els.append(TC(sx+bw/2, y+10, "Precise Review", 22, sc=GRN))
@@ -574,7 +574,7 @@ def d7():
 
     # ── Bottom banner ──
     els.append(R(200, 630, 600, 48, bg=RED_BG, fs="solid", sc=RED))
-    els.append(TC(500, 640, "Without skills/hooks: Claude ignores the graph entirely", 16, sc=RED))
+    els.append(TC(500, 640, "Without instructions/hooks: assistants may miss the graph", 16, sc=RED))
 
     return els
 
@@ -584,20 +584,24 @@ def d7():
 # ════════════════════════════════════════════
 def d8():
     els = []
-    els.append(TC(600, 20, "One Install, Every Platform", 36))
+    els.append(TC(600, 20, "One Install, 14 Targets", 36))
     els.append(TC(600, 70, "code-review-graph install", 20, sc=PRP, ff=3))
 
     platforms = [
-        ("Claude Code",  ".mcp.json",                            BLU, BLU_BG),
-        ("Cursor",       ".cursor/mcp.json",                     PRP, PRP_BG),
-        ("Windsurf",     "~/.codeium/windsurf/mcp_config.json",  ORG, ORG_BG),
-        ("Zed",          "Zed settings.json",                    GRN, GRN_BG),
-        ("Continue",     "~/.continue/config.json",              YLW, YLW_BG),
-        ("OpenCode",     ".opencode.json",                       RED, RED_BG),
-        ("Antigravity",  "~/.gemini/antigravity/mcp_config.json",GRY, GRY_BG),
-        ("Qwen Code",    "~/.qwen/settings.json",                BLU, PRP_BG),  # blue-purple
-        ("Qoder",        ".qoder/mcp.json",                      GRN, ORG_BG),  # green-orange
-        ("Kiro",         ".kiro/settings/mcp.json",              BLU, BLU_BG),
+        ("Codex",             "~/.codex/config.toml",                 BLU, BLU_BG),
+        ("Claude Code",       ".mcp.json",                            PRP, PRP_BG),
+        ("Cursor",            ".cursor/mcp.json",                     PRP, PRP_BG),
+        ("Windsurf",          "~/.codeium/windsurf/mcp_config.json",  ORG, ORG_BG),
+        ("Zed",               "~/.config/zed/settings.json",          GRN, GRN_BG),
+        ("Continue",          "~/.continue/config.json",              YLW, YLW_BG),
+        ("OpenCode",          ".opencode.json",                       RED, RED_BG),
+        ("Antigravity",       "~/.gemini/antigravity/mcp_config.json", GRY, GRY_BG),
+        ("Gemini CLI",        ".gemini/settings.json",                BLU, BLU_BG),
+        ("Qwen Code",         "~/.qwen/settings.json",                BLU, PRP_BG),
+        ("Kiro",              ".kiro/settings/mcp.json",              BLU, BLU_BG),
+        ("Qoder",             ".qoder/mcp.json",                      GRN, ORG_BG),
+        ("GitHub Copilot",    ".vscode/mcp.json",                     PRP, PRP_BG),
+        ("Copilot CLI",       "~/.copilot/mcp-config.json",           YLW, YLW_BG),
     ]
 
     # Central "install" node
@@ -605,18 +609,22 @@ def d8():
     els.append(E(center_x-60, center_y-30, 120, 60, bg=PRP_BG, fs="solid", sc=PRP))
     els.append(TC(center_x, center_y-10, "auto-detect", 15, sc=PRP))
 
-    # Fan out to platforms
-    cols = len(platforms)
-    card_w, card_h = 120, 80  # narrower cards for 9 platforms
-    total_w = cols * card_w + (cols-1) * 15  # tighter spacing
+    # Fan out to platforms in two rows.
+    cols = 7
+    card_w, card_h = 130, 78
+    gap_x, gap_y = 18, 22
+    total_w = cols * card_w + (cols-1) * gap_x
     x0 = center_x - total_w/2
-    card_y = 360
+    card_y = 330
 
     for i, (name, cfg, sc, bg) in enumerate(platforms):
-        cx = x0 + i * (card_w + 20) + card_w/2
+        row = i // cols
+        col = i % cols
+        cx = x0 + col * (card_w + gap_x) + card_w/2
+        cy = card_y + row * (card_h + gap_y)
 
         # Arrow from center
-        dx, dy = cx - center_x, card_y - center_y - 30
+        dx, dy = cx - center_x, cy - center_y - 30
         dist = math.sqrt(dx*dx + dy*dy)
         sf = 35/dist
         els.append(A(center_x + dx*sf, center_y + dy*sf,
@@ -624,14 +632,14 @@ def d8():
                      sc=sc, sw=1, op=60))
 
         # Platform card
-        els.append(R(cx-card_w/2, card_y, card_w, card_h, bg=bg, fs="solid", sc=sc))
-        els.append(TC(cx, card_y+15, name, 15, sc=sc))
+        els.append(R(cx-card_w/2, cy, card_w, card_h, bg=bg, fs="solid", sc=sc))
+        els.append(TC(cx, cy+13, name, 14, sc=sc))
         # Config path (truncated)
-        short_cfg = cfg if len(cfg) < 22 else "..." + cfg[-18:]
-        els.append(TC(cx, card_y+42, short_cfg, 9, sc=GRY, ff=3))
+        short_cfg = cfg if len(cfg) < 24 else "..." + cfg[-20:]
+        els.append(TC(cx, cy+42, short_cfg, 9, sc=GRY, ff=3))
 
     # Footer
-    els.append(TC(600, 475, "Auto-detects installed platforms \u00b7 Detects pip vs uvx \u00b7 Writes correct config", 14, sc=GRY))
+    els.append(TC(600, 540, "Auto-detects installed targets \u00b7 Detects pip vs uvx \u00b7 Writes correct config", 14, sc=GRY))
 
     return els
 
@@ -641,20 +649,19 @@ def d8():
 # ════════════════════════════════════════════
 def d9():
     els = []
-    els.append(TC(550, 15, "20 Languages + Notebook Support", 34))
+    els.append(TC(550, 15, "35 Language Labels Across 56 Extensions", 32))
 
     # Group languages by ecosystem
     groups = [
-        ("Web",       ["TypeScript", "JavaScript", "TSX", "Vue"],                  BLU, BLU_BG),
-        ("Backend",   ["Python", "Go", "Rust", "Java", "Scala"],                   GRN, GRN_BG),
-        ("Systems",   ["C", "C++", "C#"],                                          ORG, ORG_BG),
-        ("Mobile",    ["Kotlin", "Swift", "Dart"],                                 PRP, PRP_BG),
-        ("Scripting", ["Ruby", "PHP", "Perl", "Lua", "R"],                         YLW, YLW_BG),
-        ("Config",    ["Nix"],                                                     GRY, GRY_BG),
-        ("Other",     ["Solidity", "Jupyter/.ipynb"],                              GRY, GRY_BG),
+        ("Web",       ["JavaScript", "TypeScript", "TSX", "Vue", "Svelte", "ReScript"], BLU, BLU_BG),
+        ("Backend",   ["Python", "Go", "Java", "Ruby", "PHP", "Scala", "Elixir"],       GRN, GRN_BG),
+        ("Systems",   ["C", "C++", "C#", "Rust", "Zig", "Verilog"],                     ORG, ORG_BG),
+        ("Mobile/Game", ["Kotlin", "Swift", "Dart", "GDScript", "Luau"],                PRP, PRP_BG),
+        ("Data/Scripts", ["Bash", "PowerShell", "Perl", "Lua", "R", "Julia", "SQL"],    YLW, YLW_BG),
+        ("Other",     ["Nix", "Objective-C", "Solidity", "Notebooks"],                  GRY, GRY_BG),
     ]
 
-    gw = 155  # group width
+    gw = 165  # group width
     gap = 20
     total_w = len(groups) * gw + (len(groups)-1) * gap
     x0 = (1100 - total_w) / 2
@@ -683,9 +690,9 @@ def d9():
     feat_w = total_w / len(features)
     for i, feat in enumerate(features):
         fx = x0 + i * feat_w + feat_w/2
-        els.append(TC(fx, fy, "\u2713 " + feat, 13, sc=GRN))
+        els.append(TC(fx, fy, feat, 13, sc=GRN))
 
-    els.append(TC(550, fy+28, "Full Tree-sitter grammar support for every language", 14, sc=GRY))
+    els.append(TC(550, fy+28, "Tree-sitter plus notebook and specialised parsers", 14, sc=GRY))
 
     return els
 

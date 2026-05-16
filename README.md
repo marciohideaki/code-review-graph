@@ -24,15 +24,11 @@
   <a href="https://discord.gg/3p58KXqGFN"><img src="https://img.shields.io/badge/discord-join-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord"></a>
 </p>
 
-<br>
-
-AI coding tools re-read your entire codebase on every task. `code-review-graph` fixes that. It builds a structural map of your code with [Tree-sitter](https://tree-sitter.github.io/tree-sitter/), tracks changes incrementally, and gives your AI assistant precise context via [MCP](https://modelcontextprotocol.io/) so it reads only what matters.
+AI coding tools re-read your entire codebase on every task. `code-review-graph` fixes that. It builds a structural map of your code with [Tree-sitter](https://tree-sitter.github.io/tree-sitter/), tracks changes incrementally, and gives your assistant precise context via [MCP](https://modelcontextprotocol.io/) so it reads only what matters.
 
 <p align="center">
   <img src="diagrams/diagram1_before_vs_after.png" alt="The Token Problem: 8.2x average token reduction across 6 real repositories" width="85%" />
 </p>
-
----
 
 ## Quick Start
 
@@ -42,10 +38,10 @@ code-review-graph install          # auto-detects and configures all supported p
 code-review-graph build            # parse your codebase
 ```
 
-One command sets up everything. `install` detects which AI coding tools you have, writes the correct MCP configuration for each one, installs platform-native hooks/skills where supported, and injects graph-aware instructions into your platform rules. It auto-detects whether you installed via `uvx` or `pip`/`pipx` and generates the right config. Restart your editor/tool after installing.
+One command sets up the project. `install` detects supported AI coding tools, writes the correct MCP configuration, installs platform-native hooks or skills where supported, and injects graph-aware instructions into platform rule files. It detects whether you installed via `uvx`, Poetry, uv, `pip`, or `pipx`, then writes a matching server command. Restart your editor or tool after installing.
 
 <p align="center">
-  <img src="diagrams/diagram8_supported_platforms.png" alt="One Install, Every Platform: auto-detects Codex, Claude Code, Cursor, Windsurf, Zed, Continue, OpenCode, Antigravity, Qwen, Qoder, Kiro, and GitHub Copilot" width="85%" />
+  <img src="diagrams/diagram8_supported_platforms.png" alt="One install, 14 platform targets: Codex, Claude Code, Cursor, Windsurf, Zed, Continue, OpenCode, Antigravity, Gemini CLI, Qwen Code, Kiro, Qoder, GitHub Copilot, and GitHub Copilot CLI" width="85%" />
 </p>
 
 To target a specific platform:
@@ -54,8 +50,15 @@ To target a specific platform:
 code-review-graph install --platform codex       # configure only Codex
 code-review-graph install --platform cursor      # configure only Cursor
 code-review-graph install --platform claude-code  # configure only Claude Code
+code-review-graph install --platform windsurf    # configure only Windsurf
+code-review-graph install --platform zed         # configure only Zed
+code-review-graph install --platform continue    # configure only Continue
+code-review-graph install --platform opencode    # configure only OpenCode
+code-review-graph install --platform antigravity # configure only Antigravity
 code-review-graph install --platform gemini-cli   # configure only Gemini CLI
+code-review-graph install --platform qwen        # configure only Qwen Code
 code-review-graph install --platform kiro         # configure only Kiro
+code-review-graph install --platform qoder       # configure only Qoder
 code-review-graph install --platform copilot      # configure only GitHub Copilot (VS Code)
 code-review-graph install --platform copilot-cli  # configure only GitHub Copilot CLI
 ```
@@ -68,7 +71,7 @@ Then open your project and ask your AI assistant:
 Build the code review graph for this project
 ```
 
-The initial build takes ~10 seconds for a 500-file project. After that, the graph updates automatically on every file edit and git commit.
+The initial build takes about 10 seconds for a 500-file project. After that, the graph updates automatically on file edits and git commits.
 
 
 ## How It Works
@@ -77,7 +80,7 @@ The initial build takes ~10 seconds for a 500-file project. After that, the grap
   <img src="diagrams/diagram7_mcp_integration_flow.png" alt="How your AI assistant uses the graph: User asks for review, AI checks MCP tools, graph returns blast radius and risk scores, AI reads only what matters" width="80%" />
 </p>
 
-Your repository is parsed into an AST with Tree-sitter, stored as a graph of nodes (functions, classes, imports) and edges (calls, inheritance, test coverage), then queried at review time to compute the minimal set of files your AI assistant needs to read.
+Your repository is parsed into an AST with Tree-sitter, stored as a graph of nodes (files, functions, classes, types, and tests) and edges (calls, imports, inheritance, references, test coverage, framework wiring, and message topics), then queried at review time to compute the smallest useful set of files for your assistant to read.
 
 <p align="center">
   <img src="diagrams/diagram2_architecture_pipeline.png" alt="Architecture pipeline: Repository to Tree-sitter Parser to SQLite Graph to Blast Radius to Minimal Review Set" width="100%" />
@@ -88,7 +91,7 @@ Your repository is parsed into an AST with Tree-sitter, stored as a graph of nod
 When a file changes, the graph traces every caller, dependent, and test that could be affected. This is the "blast radius" of the change. Your AI reads only these files instead of scanning the whole project.
 
 <p align="center">
-  <img src="diagrams/diagram3_blast_radius.png" alt="Blast radius visualization showing how a change to login() propagates to callers, dependents, and tests" width="70%" />
+  <img src="diagrams/diagram3_blast_radius.png" alt="Blast radius visualisation showing how a change to login() propagates to callers, dependents, and tests" width="70%" />
 </p>
 
 ### Incremental updates in < 2 seconds
@@ -101,21 +104,19 @@ On every git commit or file save, a hook fires. The graph diffs changed files, f
 
 ### The monorepo problem, solved
 
-Large monorepos are where token waste is most painful. The graph cuts through the noise — 27,700+ files excluded from review context, only ~15 files actually read.
+Large monorepos are where token waste is most painful. The graph cuts through the noise: 27,700+ files excluded from review context, with only about 15 files read.
 
 <p align="center">
-  <img src="diagrams/diagram6_monorepo_funnel.png" alt="Next.js monorepo: 27,732 files funnelled through code-review-graph down to ~15 files — 49x fewer tokens" width="80%" />
+  <img src="diagrams/diagram6_monorepo_funnel.png" alt="Next.js monorepo: 27,732 files funnelled through code-review-graph down to about 15 files, 49x fewer tokens" width="80%" />
 </p>
 
-### 24 languages + Jupyter notebooks
+### 35 language labels across 56 extensions
 
 <p align="center">
-  <img src="diagrams/diagram9_language_coverage.png" alt="24 languages organized by category: Web, Backend, Systems, Mobile, Scripting, Config (Nix), plus Jupyter/Databricks notebook support" width="90%" />
+  <img src="diagrams/diagram9_language_coverage.png" alt="35 language labels across web, backend, systems, mobile, scripting, data, hardware, configuration, and notebooks" width="90%" />
 </p>
 
-Full Tree-sitter grammar support for functions, classes, imports, call sites, inheritance, and test detection in every language. Includes Zig, PowerShell, Julia, Svelte SFC, and flake-aware Nix support. Plus Jupyter/Databricks notebook parsing (`.ipynb`) with multi-language cell support (Python, R, SQL), and Perl XS files (`.xs`).
-
----
+Full parser support covers 35 language labels across 56 extensions: Bash, C, C++, C#, Dart, Elixir, GDScript, Go, Java, JavaScript, Julia, Kotlin, Lua, Luau, Nix, notebooks, Objective-C, Perl, PHP, PowerShell, Python, R, ReScript, Ruby, Rust, Scala, Solidity, SQL, Svelte, Swift, TSX, TypeScript, Verilog/SystemVerilog, Vue, and Zig. Notebook parsing supports Jupyter and Databricks `.ipynb` files with Python, R, SQL, and Scala cells. Perl XS files (`.xs`) are parsed as C.
 
 ## Benchmarks
 
@@ -149,7 +150,7 @@ The graph replaces reading entire source files with a compact structural context
 <summary><strong>Impact accuracy: 100% recall, 0.54 average F1</strong></summary>
 <br>
 
-The blast-radius analysis never misses an actually impacted file (perfect recall). It over-predicts in some cases, which is a conservative trade-off — better to flag too many files than miss a broken dependency.
+The blast-radius analysis never misses an actually impacted file (perfect recall). It over-predicts in some cases, which is a conservative trade-off: better to flag too many files than miss a broken dependency.
 
 | Repo | Commits | Avg F1 | Avg Precision | Recall |
 |------|--------:|-------:|--------------:|-------:|
@@ -188,14 +189,12 @@ The blast-radius analysis never misses an actually impacted file (perfect recall
 
 </details>
 
----
-
 ## Features
 
 | Feature | Details |
 |---------|---------|
 | **Incremental updates** | Re-parses only changed files. Subsequent updates complete in under 2 seconds. |
-| **24 languages + notebooks** | Python, TypeScript/TSX, JavaScript, Vue, Svelte, Go, Rust, Java, Scala, C#, Ruby, Kotlin, Swift, PHP, Solidity, C/C++, Dart, R, Perl, Lua, Zig, PowerShell, Julia, Nix, Jupyter/Databricks (.ipynb) |
+| **35 language labels across 56 extensions** | Bash, C, C++, C#, Dart, Elixir, GDScript, Go, Java, JavaScript, Julia, Kotlin, Lua, Luau, Nix, notebooks, Objective-C, Perl, PHP, PowerShell, Python, R, ReScript, Ruby, Rust, Scala, Solidity, SQL, Svelte, Swift, TSX, TypeScript, Verilog/SystemVerilog, Vue, and Zig |
 | **Blast-radius analysis** | Shows exactly which functions, classes, and files are affected by any change |
 | **Auto-update hooks** | Graph updates on every file edit and git commit without manual intervention |
 | **Semantic search** | Optional vector embeddings via sentence-transformers, Google Gemini, MiniMax, or any OpenAI-compatible endpoint (real OpenAI, Azure, new-api, LiteLLM, vLLM, LocalAI) |
@@ -214,17 +213,15 @@ The blast-radius analysis never misses an actually impacted file (perfect recall
 | **Execution flows** | Trace call chains from entry points, sorted by weighted criticality |
 | **Community detection** | Cluster related code via Leiden algorithm with resolution scaling for large graphs |
 | **Architecture overview** | Auto-generated architecture map with coupling warnings |
-| **Risk-scored reviews** | `detect_changes` maps diffs to affected functions, flows, and test gaps |
+| **Risk-scored reviews** | `detect_changes_tool` maps diffs to affected functions, flows, and test gaps |
 | **Refactoring tools** | Rename preview, framework-aware dead code detection, community-driven suggestions |
 | **Wiki generation** | Auto-generate markdown wiki from community structure |
 | **Multi-repo registry** | Register multiple repos, search across all of them |
 | **Multi-repo daemon** | `crg-daemon` watches multiple repos as child processes, with health checks and auto-restart |
 | **MCP prompts** | 5 workflow templates: review, architecture, debug, onboard, pre-merge |
 | **Full-text search** | FTS5-powered hybrid search combining keyword and vector similarity |
-| **Local storage** | SQLite file in `.code-review-graph/`. No external database, no cloud dependency. |
+| **Local storage** | SQLite file in `.code-review-graph/`. No external database. Cloud calls happen only when you opt into cloud embeddings. |
 | **Watch mode** | Continuous graph updates as you work |
-
----
 
 ## Usage
 
@@ -265,7 +262,8 @@ code-review-graph daemon start     # Start multi-repo watch daemon
 code-review-graph daemon stop      # Stop the daemon
 code-review-graph daemon status    # Show daemon status and repos
 code-review-graph eval             # Run evaluation benchmarks
-code-review-graph serve            # Start MCP server
+code-review-graph serve            # Start MCP server over stdio
+code-review-graph serve --http     # Start streamable HTTP MCP on localhost:5555
 ```
 
 </details>
@@ -277,9 +275,9 @@ code-review-graph serve            # Start MCP server
 If your editor doesn't support hooks (e.g. Cursor, OpenCode), or you just want your
 graph to stay fresh in the background without any editor integration, the daemon is
 for you. It watches your repos for file changes and automatically rebuilds the graph
-— no manual `build` or `update` commands needed.
+without manual `build` or `update` commands.
 
-The daemon is included with `code-review-graph` — no separate install required.
+The daemon is included with `code-review-graph`; no separate install is required.
 
 **Quick setup:**
 
@@ -291,7 +289,7 @@ crg-daemon add ~/project-b
 # 2. Start the daemon (runs in the background)
 crg-daemon start
 
-# 3. That's it — graphs stay up to date automatically
+# 3. Graphs stay up to date automatically
 crg-daemon status                 # check daemon and per-repo watcher status
 crg-daemon logs --repo proj-a -f  # tail logs for a specific repo
 crg-daemon stop                   # stop daemon and all watcher processes
@@ -322,7 +320,7 @@ full config reference and all available options.
 </details>
 
 <details>
-<summary><strong>28 MCP tools</strong></summary>
+<summary><strong>30 MCP tools</strong></summary>
 <br>
 
 Your AI assistant uses these automatically once the graph is built.
@@ -330,7 +328,8 @@ Your AI assistant uses these automatically once the graph is built.
 | Tool | Description |
 |------|-------------|
 | `build_or_update_graph_tool` | Build or incrementally update the graph |
-| `get_minimal_context_tool` | Ultra-compact context (~100 tokens) — call this first |
+| `run_postprocess_tool` | Re-run signatures, FTS, flow detection, and community detection |
+| `get_minimal_context_tool` | Ultra-compact context (~100 tokens): call this first |
 | `get_impact_radius_tool` | Blast radius of changed files |
 | `get_review_context_tool` | Token-optimised review context with structural summary |
 | `query_graph_tool` | Callers, callees, tests, imports, inheritance queries |
@@ -352,7 +351,7 @@ Your AI assistant uses these automatically once the graph is built.
 | `get_knowledge_gaps_tool` | Identify structural weaknesses and untested hotspots |
 | `get_surprising_connections_tool` | Detect unexpected cross-community coupling |
 | `get_suggested_questions_tool` | Auto-generated review questions from analysis |
-| `refactor_tool` | Rename preview, dead code detection, suggestions |
+| `refactor_tool` | Rename preview, dead code detection, and refactoring suggestions |
 | `apply_refactor_tool` | Apply a previously previewed refactoring |
 | `generate_wiki_tool` | Generate markdown wiki from communities |
 | `get_wiki_page_tool` | Retrieve a specific wiki page |
@@ -387,6 +386,7 @@ pip install code-review-graph[google-embeddings]   # Google Gemini embeddings
 pip install code-review-graph[communities]         # Community detection (igraph)
 pip install code-review-graph[eval]                # Evaluation benchmarks (matplotlib)
 pip install code-review-graph[wiki]                # Wiki generation with LLM summaries (ollama)
+pip install code-review-graph[enrichment]          # Jedi-powered Python call resolution
 pip install code-review-graph[all]                 # All optional dependencies
 ```
 
@@ -405,12 +405,19 @@ pip install code-review-graph[all]                 # All optional dependencies
 | `CRG_OPENAI_API_KEY` | API key for OpenAI-compatible embeddings | - |
 | `CRG_OPENAI_MODEL` | Model name for OpenAI-compatible embeddings | - |
 | `CRG_OPENAI_DIMENSION` | Pin embedding dimension (v3 models support reduction) | - |
-| `NO_COLOR` | If set, disables ANSI colors in terminal | - |
+| `CRG_OPENAI_BATCH_SIZE` | Batch size for OpenAI-compatible embeddings | `100` |
+| `CRG_ACCEPT_CLOUD_EMBEDDINGS` | Set to `1` to suppress the cloud embedding warning | - |
+| `CRG_TOOLS` | Comma-separated allow-list of MCP tools exposed by `serve` | - |
+| `CRG_DATA_DIR` | External directory for graph data | - |
+| `CRG_REPO_ROOT` | Explicit repository root override | - |
+| `CRG_PARSE_WORKERS` | Maximum parser workers | CPU count capped at 8 |
+| `CRG_PARSE_EXECUTOR` | Parser executor kind: `process` or `thread` | platform-aware |
+| `NO_COLOR` | If set, disables ANSI colours in terminal | - |
 | `CRG_SERIAL_PARSE` | If `1`, disables parallel parsing (use for debugging) | - |
 
 OpenAI-compatible embeddings (real OpenAI, Azure, or any self-hosted gateway like
-new-api / LiteLLM / vLLM / LocalAI / Ollama in openai mode) need no extra install —
-just set the environment variables and pass `provider="openai"` to `embed_graph`:
+new-api / LiteLLM / vLLM / LocalAI / Ollama in openai mode) need no extra install.
+Set the environment variables and pass `provider="openai"` to `embed_graph_tool`:
 
 ```bash
 export CRG_OPENAI_BASE_URL=http://127.0.0.1:3000/v1     # or https://api.openai.com/v1
@@ -422,13 +429,12 @@ export CRG_OPENAI_BATCH_SIZE=100                        # lower for gateways wit
                                                         # (e.g. Qwen text-embedding-v4 caps at 10)
 ```
 
-The cloud-egress warning is auto-skipped when the base URL points to localhost
-(`127.0.0.1`, `localhost`, `0.0.0.0`, `::1`).
+Cloud providers send function names, docstrings, and file paths to the selected external API. The tool prints a stderr warning before using Google, MiniMax, or a non-local OpenAI-compatible endpoint. The warning is skipped when the OpenAI-compatible base URL points to localhost (`127.0.0.1`, `localhost`, `0.0.0.0`, `::1`) or when `CRG_ACCEPT_CLOUD_EMBEDDINGS=1` is set.
 
-> **Model selection tip.** Avoid `-preview` / `-beta` / `-exp` model IDs
-> (e.g. `google/gemini-embedding-2-preview`) for anything you plan to keep
-> long-term — preview models can change weights (different dimension → full
-> re-embed required) or be deprecated without notice. Prefer stable GA
+> **Model selection tip.** Avoid `-preview`, `-beta`, or `-exp` model IDs
+> (for example `google/gemini-embedding-2-preview`) for anything you plan to keep
+> long term. Preview models can change weights, which may require a full
+> re-embed, or be deprecated without notice. Prefer stable GA
 > releases such as `text-embedding-3-small` / `text-embedding-3-large` (OpenAI),
 > `Qwen/Qwen3-Embedding-8B` (via self-hosted vLLM / LocalAI), or
 > `gemini-embedding-001` (via the native Gemini provider, which requires
@@ -443,7 +449,7 @@ The cloud-egress warning is auto-skipped when the base URL points to localhost
 
 #### Tool Filtering
 
-CRG exposes 28 MCP tools by default. In token-constrained environments, you can
+CRG exposes 30 MCP tools by default. In token-constrained environments, you can
 limit the server to a subset of tools using `--tools` or the `CRG_TOOLS`
 environment variable:
 
@@ -471,8 +477,6 @@ all tools are available. This is especially useful for MCP client configurations
 
 </details>
 
----
-
 ## Troubleshooting
 
 ### `pip` / `pipx` cannot download `hatchling` (or `Errno 9` / `Bad file descriptor` to PyPI)
@@ -491,10 +495,10 @@ Installing from a **source tree** (for example `pipx install .`) needs build dep
 
 3. For **development in a clone** without a global install, use `uv sync` and `uv run code-review-graph …` (or activate `.venv` after `uv sync`).
 
-**Diagnose (optional):** `python3 scripts/diagnose_pypi_connectivity.py` — if it prints `FAILED`, the issue is environment/network, not a wrong package name in this repo.
+**Diagnose (optional):** run `python3 scripts/diagnose_pypi_connectivity.py`. If it prints `FAILED`, the issue is environment or network access, not a wrong package name in this repo.
 
-### Windows Configuration Issues (Invalid JSON / Connection Closed)
-If you are using Windows and encounter `Invalid JSON: EOF while parsing` or `MCP error -32000: Connection closed` when connecting via Claude Code, do not use the `cmd /c` wrapper in your config.
+### Windows Claude Code Configuration Issues (Invalid JSON / Connection Closed)
+If you are using Claude Code on Windows and encounter `Invalid JSON: EOF while parsing` or `MCP error -32000: Connection closed`, do not use the `cmd /c` wrapper in your config. Other MCP clients may use different config files, but the same direct-executable approach applies.
 
 Ensure `fastmcp` is updated to at least `3.2.4+`. Then, configure your `~/.claude.json` to execute the `.exe` directly and pass the UTF-8 environment variable via the config:
 

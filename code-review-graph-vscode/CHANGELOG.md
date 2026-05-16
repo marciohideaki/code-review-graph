@@ -1,11 +1,16 @@
 # Changelog
 
-## 0.2.1 — 2026-04-08
+## 0.2.2 - 2026-05-16
+
+### Changed
+- Refreshed extension documentation and marketplace copy for British English and current backend wording.
+
+## 0.2.1 - 2026-04-08
 
 ### Fixed
 - Compatible with Python backend schema v6 (no extension-side schema changes in this release)
 
-## 0.2.0 — 2026-03-20
+## 0.2.0 - 2026-03-20
 
 ### Added
 - **Query Graph** command with 8 query patterns (callers_of, callees_of, imports_of, etc.)
@@ -21,13 +26,13 @@
 - Updated README with complete command table (13 commands)
 - All 13 commands now documented
 
-## 0.1.1 — 2026-03-17
+## 0.1.1 - 2026-03-17
 
 ### Fixed
 - CLI path setting scoped to `machine` level (security fix)
 - Secure nonce generation using `crypto.randomBytes()`
 
-## 0.1.0 — 2026-03-17
+## 0.1.0 - 2026-03-17
 
 Initial release.
 

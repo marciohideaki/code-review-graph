@@ -1,7 +1,7 @@
 {
   "name": "code-review-graph",
   "displayName": "Code Review Graph",
-  "description": "Visualize code dependencies, blast radius, and review context from your code-review-graph database directly in VS Code.",
+  "description": "Visualise code dependencies, blast radius, and review context from your code-review-graph database directly in VS Code.",
   "version": "0.2.2",
   "publisher": "tirth8205",
   "license": "MIT",
@@ -9,7 +9,7 @@
   "keywords": [
     "code analysis",
     "graph",
-    "visualization",
+    "visualisation",
     "dependencies",
     "blast radius",
     "code review",
@@ -193,7 +193,7 @@
             "light",
             "dark"
           ],
-          "description": "Color theme for the graph visualization. 'auto' follows the VS Code theme."
+          "description": "Colour theme for the graph visualisation. 'auto' follows the VS Code theme."
         },
         "codeReviewGraph.treeView.showFunctions": {
           "type": "boolean",
@@ -242,14 +242,14 @@
               "DEPENDS_ON"
             ]
           },
-          "description": "Edge types shown by default in the graph visualization."
+          "description": "Edge types shown by default in the graph visualisation."
         },
         "codeReviewGraph.graph.maxNodes": {
           "type": "number",
           "default": 500,
           "minimum": 10,
           "maximum": 5000,
-          "description": "Maximum number of nodes to display in the graph visualization."
+          "description": "Maximum number of nodes to display in the graph visualisation."
         }
       }
     },
@@ -270,7 +270,7 @@
           {
             "id": "codeReviewGraph.welcome.build",
             "title": "Build Your Graph",
-            "description": "Run the build command to analyze your codebase and create a graph database.\n\n[Build Graph](command:codeReviewGraph.buildGraph)",
+            "description": "Run the build command to analyse your codebase and create a graph database.\n\n[Build Graph](command:codeReviewGraph.buildGraph)",
             "media": {
               "markdown": "media/walkthrough/build.md"
             }

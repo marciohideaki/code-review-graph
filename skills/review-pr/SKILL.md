@@ -8,7 +8,7 @@ argument-hint: "[PR number or branch name]"
 
 Perform a comprehensive code review of a pull request or branch diff using the knowledge graph.
 
-**Token optimization:** Before starting, call `get_docs_section_tool(section_name="review-pr")` for the optimized workflow. Never include full files unless explicitly asked.
+**Token optimisation:** Before starting, call `get_docs_section_tool(section_name="review-pr")` for the optimised workflow. Never include full files unless explicitly asked.
 
 ## Steps
 
@@ -22,7 +22,7 @@ Perform a comprehensive code review of a pull request or branch diff using the k
    - This uses `main` (or the specified base branch) as the diff base
    - Returns all changed files across all commits in the PR
 
-4. **Analyze impact** by calling `get_impact_radius_tool(base="main")`:
+4. **Analyse impact** by calling `get_impact_radius_tool(base="main")`:
    - Review the blast radius across the entire PR
    - Identify high-risk areas (widely depended-upon code)
 

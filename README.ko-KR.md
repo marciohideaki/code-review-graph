@@ -45,7 +45,7 @@ code-review-graph build            # 코드베이스 파싱
 하나의 명령으로 모든 설정이 완료됩니다. `install`은 사용 중인 AI 코딩 도구를 감지하고, 각 도구에 맞는 MCP 설정을 작성하며, 플랫폼 규칙에 그래프 인식 지침을 주입합니다. `uvx` 또는 `pip`/`pipx` 중 어떤 방식으로 설치했는지 자동 감지하여 올바른 설정을 생성합니다. 설치 후 에디터/도구를 재시작하세요.
 
 <p align="center">
-  <img src="diagrams/diagram8_supported_platforms.png" alt="한 번의 설치로 모든 플랫폼 지원: Codex, Claude Code, Cursor, Windsurf, Zed, Continue, OpenCode, Antigravity, Kiro 자동 감지" width="85%" />
+  <img src="diagrams/diagram8_supported_platforms.png" alt="한 번의 설치로 모든 플랫폼 지원: Codex, Claude Code, Cursor, Windsurf, Zed, Continue, OpenCode, Antigravity, Gemini CLI, Qwen Code, Kiro, Qoder, GitHub Copilot, GitHub Copilot CLI 자동 감지" width="85%" />
 </p>
 
 특정 플랫폼만 설정하려면:
@@ -54,7 +54,17 @@ code-review-graph build            # 코드베이스 파싱
 code-review-graph install --platform codex       # Codex만 설정
 code-review-graph install --platform cursor      # Cursor만 설정
 code-review-graph install --platform claude-code  # Claude Code만 설정
+code-review-graph install --platform windsurf     # Windsurf만 설정
+code-review-graph install --platform zed          # Zed만 설정
+code-review-graph install --platform continue     # Continue만 설정
+code-review-graph install --platform opencode     # OpenCode만 설정
+code-review-graph install --platform antigravity  # Antigravity만 설정
+code-review-graph install --platform gemini-cli   # Gemini CLI만 설정
+code-review-graph install --platform qwen         # Qwen Code만 설정
 code-review-graph install --platform kiro         # Kiro만 설정
+code-review-graph install --platform qoder        # Qoder만 설정
+code-review-graph install --platform copilot      # GitHub Copilot만 설정
+code-review-graph install --platform copilot-cli  # GitHub Copilot CLI만 설정
 ```
 
 Python 3.10 이상이 필요합니다. 최상의 경험을 위해 [uv](https://docs.astral.sh/uv/)를 설치하세요 (MCP 설정은 `uvx`가 있으면 이를 사용하고, 없으면 `code-review-graph` 명령을 직접 사용합니다).
@@ -105,13 +115,13 @@ git 커밋이나 파일 저장마다 훅이 실행됩니다. 그래프는 변경
   <img src="diagrams/diagram6_monorepo_funnel.png" alt="Next.js 모노레포: 27,732개 파일이 code-review-graph를 거쳐 약 15개 파일로 -- 49배 적은 토큰" width="80%" />
 </p>
 
-### 23개 언어 + Jupyter 노트북
+### 56개 확장자에 걸친 35개 언어 라벨
 
 <p align="center">
-  <img src="diagrams/diagram9_language_coverage.png" alt="카테고리별 19개 언어: 웹, 백엔드, 시스템, 모바일, 스크립팅, 그리고 Jupyter/Databricks 노트북 지원" width="90%" />
+  <img src="diagrams/diagram9_language_coverage.png" alt="56개 확장자에 걸친 35개 언어 라벨과 Jupyter/Databricks 노트북 지원" width="90%" />
 </p>
 
-모든 언어에서 함수, 클래스, import, 호출 위치, 상속, 테스트 감지를 위한 완전한 Tree-sitter 문법을 지원합니다. Zig, PowerShell, Julia, Svelte SFC도 포함됩니다. 다중 언어 셀 지원(Python, R, SQL)이 가능한 Jupyter/Databricks 노트북(`.ipynb`) 파싱과 Perl XS 파일(`.xs`)도 지원합니다.
+함수, 클래스, import, 호출 위치, 상속, 테스트 감지를 위한 Tree-sitter 문법을 지원합니다. 언어 라벨은 Bash, C, C++, C#, Dart, Elixir, GDScript, Go, Java, JavaScript, Julia, Kotlin, Lua, Luau, Nix, Objective-C, Perl, PHP, PowerShell, Python, R, ReScript, Ruby, Rust, Scala, Solidity, SQL, Svelte, Swift, TSX, TypeScript, Verilog/SystemVerilog, Vue, Zig입니다. 다중 언어 셀(Python, R, SQL)을 포함한 Jupyter/Databricks 노트북(`.ipynb`)과 Perl XS 파일(`.xs`)도 파싱합니다.
 
 ---
 
@@ -132,7 +142,7 @@ git 커밋이나 파일 저장마다 훅이 실행됩니다. 그래프는 변경
 | 기능 | 세부 사항 |
 |------|-----------|
 | **점진적 업데이트** | 변경된 파일만 다시 파싱합니다. 이후 업데이트는 2초 이내에 완료됩니다. |
-| **23개 언어 + 노트북** | Python, TypeScript/TSX, JavaScript, Vue, Svelte, Go, Rust, Java, Scala, C#, Ruby, Kotlin, Swift, PHP, Solidity, C/C++, Dart, R, Perl, Lua, Zig, PowerShell, Julia, Jupyter/Databricks (.ipynb) |
+| **56개 확장자에 걸친 35개 언어 라벨** | Bash, C, C++, C#, Dart, Elixir, GDScript, Go, Java, JavaScript, Julia, Kotlin, Lua, Luau, Nix, Objective-C, Perl, PHP, PowerShell, Python, R, ReScript, Ruby, Rust, Scala, Solidity, SQL, Svelte, Swift, TSX, TypeScript, Verilog/SystemVerilog, Vue, Zig, Jupyter/Databricks (.ipynb) |
 | **영향 범위 분석** | 변경에 의해 영향 받는 함수, 클래스, 파일을 정확히 보여줍니다 |
 | **자동 업데이트 훅** | 수동 개입 없이 파일 편집 및 git 커밋마다 그래프가 업데이트됩니다 |
 | **시맨틱 검색** | sentence-transformers, Google Gemini, MiniMax, 또는 OpenAI 호환 엔드포인트(실제 OpenAI, Azure, new-api, LiteLLM, vLLM, LocalAI)를 통한 선택적 벡터 임베딩 |
@@ -151,13 +161,13 @@ git 커밋이나 파일 저장마다 훅이 실행됩니다. 그래프는 변경
 | **실행 흐름** | 가중 중요도 순으로 정렬된 진입점에서의 호출 체인 추적 |
 | **커뮤니티 감지** | 대규모 그래프를 위한 해상도 스케일링이 포함된 Leiden 알고리즘으로 관련 코드 클러스터링 |
 | **아키텍처 개요** | 결합 경고가 포함된 자동 생성 아키텍처 맵 |
-| **위험 점수 리뷰** | `detect_changes`가 diff를 영향 받는 함수, 흐름, 테스트 격차에 매핑 |
+| **위험 점수 리뷰** | `detect_changes_tool`이 diff를 영향 받는 함수, 흐름, 테스트 격차에 매핑 |
 | **리팩토링 도구** | 이름 변경 미리보기, 프레임워크 인식 데드 코드 감지, 커뮤니티 기반 제안 |
 | **위키 생성** | 커뮤니티 구조에서 마크다운 위키 자동 생성 |
 | **멀티 레포 레지스트리** | 여러 저장소를 등록하고 모든 저장소에서 검색 |
 | **MCP 프롬프트** | 5개 워크플로 템플릿: 리뷰, 아키텍처, 디버그, 온보딩, 사전 머지 검사 |
 | **전문 검색** | FTS5 기반 키워드와 벡터 유사도를 결합한 하이브리드 검색 |
-| **로컬 스토리지** | `.code-review-graph/`에 SQLite 파일 저장. 외부 데이터베이스나 클라우드 의존성 없음. |
+| **로컬 스토리지** | `.code-review-graph/`에 SQLite 파일 저장. 외부 데이터베이스는 필요 없습니다. 클라우드 호출은 클라우드 임베딩 provider를 선택한 경우에만 발생합니다. |
 | **감시 모드** | 작업 중 지속적인 그래프 업데이트 |
 
 ---
@@ -204,7 +214,7 @@ code-review-graph serve            # MCP 서버 시작
 </details>
 
 <details>
-<summary><strong>28개 MCP 도구</strong></summary>
+<summary><strong>30개 MCP 도구</strong></summary>
 <br>
 
 그래프가 빌드되면 AI 어시스턴트가 이 도구들을 자동으로 사용합니다.
@@ -212,6 +222,7 @@ code-review-graph serve            # MCP 서버 시작
 | 도구 | 설명 |
 |------|------|
 | `build_or_update_graph_tool` | 그래프 빌드 또는 점진적 업데이트 |
+| `run_postprocess_tool` | 기존 그래프에서 시그니처, 흐름, 커뮤니티, 전문 검색 인덱스를 다시 실행 |
 | `get_minimal_context_tool` | 초소형 컨텍스트 (~100 토큰) -- 이것을 먼저 호출 |
 | `get_impact_radius_tool` | 변경된 파일의 영향 범위 |
 | `get_review_context_tool` | 구조적 요약이 포함된 토큰 최적화 리뷰 컨텍스트 |
@@ -269,10 +280,11 @@ pip install code-review-graph[google-embeddings]   # Google Gemini 임베딩
 pip install code-review-graph[communities]         # 커뮤니티 감지 (igraph)
 pip install code-review-graph[eval]                # 평가 벤치마크 (matplotlib)
 pip install code-review-graph[wiki]                # LLM 요약 위키 생성 (ollama)
+pip install code-review-graph[enrichment]          # 코드 보강 기능 (tree-sitter-languages)
 pip install code-review-graph[all]                 # 모든 선택적 의존성
 ```
 
-OpenAI 호환 임베딩(실제 OpenAI, Azure, 또는 자체 호스팅 게이트웨이 new-api / LiteLLM / vLLM / LocalAI / Ollama openai 모드)은 추가 설치가 필요하지 않습니다. 환경 변수만 설정하고 `embed_graph`에 `provider="openai"`를 전달하면 됩니다:
+OpenAI 호환 임베딩(실제 OpenAI, Azure, 또는 자체 호스팅 게이트웨이 new-api / LiteLLM / vLLM / LocalAI / Ollama openai 모드)은 추가 설치가 필요하지 않습니다. 환경 변수만 설정하고 `embed_graph_tool`에 `provider="openai"`를 전달하면 됩니다:
 
 ```bash
 export CRG_OPENAI_BASE_URL=http://127.0.0.1:3000/v1     # 또는 https://api.openai.com/v1

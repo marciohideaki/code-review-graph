@@ -2,51 +2,54 @@
 
 ## Project Overview
 
-**code-review-graph** is a persistent, incrementally-updated knowledge graph for token-efficient code reviews with Claude Code. It parses codebases using Tree-sitter, builds a structural graph in SQLite, and exposes it via MCP tools and prompts.
+`code-review-graph` is a persistent, incrementally updated knowledge graph for token-efficient code review across AI coding tools. Claude Code is one supported client. The project also supports Codex, Cursor, Windsurf, Zed, Continue, OpenCode, Antigravity, Gemini CLI, Qwen Code, Kiro, Qoder, GitHub Copilot, and GitHub Copilot CLI.
+
+The tool parses repositories with Tree-sitter, stores structural relationships in SQLite, and exposes 30 MCP tools plus 5 MCP prompts for review, search, architecture analysis, refactoring, wiki generation, and multi-repo work.
 
 ## Graph Tool Usage (Token-Efficient)
 When using code-review-graph MCP tools, follow these rules:
-1. First call: `get_minimal_context(task="<description>")` — costs ~100 tokens, gives you the full picture.
+1. First call: `get_minimal_context_tool(task="<description>")` for compact task context.
 2. All subsequent calls: use `detail_level="minimal"` unless you need more.
-3. Prefer `query_graph` with a specific target over broad `list_*` calls.
+3. Prefer `query_graph_tool` with a specific target over broad `list_*` calls.
 4. The `next_tool_suggestions` field in every response tells you the optimal next step.
 5. Target: ≤5 tool calls per task, ≤800 total tokens of graph context.
 
 ## Architecture
 
 - **Core Package**: `code_review_graph/` (Python 3.10+)
-  - `parser.py` — Tree-sitter multi-language AST parser (20 languages including Vue SFC, Solidity, Dart, R, Perl, Lua, Nix + Jupyter/Databricks notebooks)
-  - `graph.py` — SQLite-backed graph store (nodes, edges, BFS impact analysis)
-  - `tools.py` — 22 MCP tool implementations
-  - `main.py` — FastMCP server entry point (stdio transport), registers 22 tools + 5 prompts
-  - `incremental.py` — Git-based change detection, file watching
-  - `embeddings.py` — Optional vector embeddings (Local sentence-transformers, Google Gemini, MiniMax)
-  - `visualization.py` — D3.js interactive HTML graph generator
-  - `cli.py` — CLI entry point (install, build, update, watch, status, visualize, serve, wiki, detect-changes, register, unregister, repos, eval)
-  - `flows.py` — Execution flow detection and criticality scoring
-  - `communities.py` — Community detection (Leiden algorithm or file-based grouping) and architecture overview
-  - `search.py` — FTS5 hybrid search (keyword + vector)
-  - `changes.py` — Risk-scored change impact analysis (detect-changes)
-  - `refactor.py` — Rename preview, dead code detection, refactoring suggestions
-  - `hints.py` — Review hint generation
-  - `prompts.py` — 5 MCP prompt templates (review_changes, architecture_map, debug_issue, onboard_developer, pre_merge_check)
-  - `wiki.py` — Markdown wiki generation from community structure
-  - `skills.py` — Skill definitions for Claude Code plugin
-  - `registry.py` — Multi-repo registry with connection pool
-  - `migrations.py` — Database schema migrations (v1-v5)
-  - `tsconfig_resolver.py` — TypeScript path alias resolution
+  - `parser.py`: Tree-sitter parser for 35 language labels across 56 extensions, notebooks, and shebang-detected scripts
+  - `graph.py`: SQLite graph store with nodes, edges, confidence scoring, metadata, and impact queries
+  - `main.py`: FastMCP entry point, stdio and streamable HTTP transport, 30 tools and 5 prompts
+  - `tools/`: grouped MCP tool implementation modules
+  - `incremental.py`: git/SVN change detection, file watching, hashing, and post-build resolver passes
+  - `embeddings.py`: local, Google Gemini, MiniMax, and OpenAI-compatible embeddings
+  - `visualization.py`: D3.js interactive HTML visualisation generator
+  - `cli.py`: CLI entry point for install, build, update, postprocess, watch, status, visualise, serve, wiki, detect-changes, registry, daemon, and eval
+  - `daemon.py` and `daemon_cli.py`: multi-repo watcher supervision
+  - `flows.py`: execution flow detection and criticality scoring
+  - `communities.py`: Leiden or file-based community detection and architecture overview
+  - `search.py`: FTS5 and vector hybrid search
+  - `changes.py`: risk-scored change impact analysis
+  - `refactor.py`: rename preview, dry-run/apply support, dead code detection, and refactoring suggestions
+  - `hints.py`: review hint generation
+  - `prompts.py`: 5 MCP prompt templates
+  - `wiki.py`: markdown wiki generation from community structure
+  - `skills.py`: platform config, hooks, instruction snippets, and generated skills
+  - `registry.py`: multi-repo registry with connection pool
+  - `migrations.py`: database migrations through schema v9
+  - `tsconfig_resolver.py`: TypeScript path alias resolution
 
 - **VS Code Extension**: `code-review-graph-vscode/` (TypeScript)
   - Separate subproject with its own `package.json`, `tsconfig.json`
   - Reads from `.code-review-graph/graph.db` via SQLite
 
-- **Database**: `.code-review-graph/graph.db` (SQLite, WAL mode)
+- **Database**: `.code-review-graph/graph.db` or `CRG_DATA_DIR` (SQLite, WAL mode)
 
 ## Key Commands
 
 ```bash
 # Development
-uv run pytest tests/ --tb=short -q          # Run tests (572 tests)
+uv run pytest tests/ --tb=short -q          # Run tests
 uv run ruff check code_review_graph/        # Lint
 uv run mypy code_review_graph/ --ignore-missing-imports --no-strict-optional
 
@@ -54,12 +57,14 @@ uv run mypy code_review_graph/ --ignore-missing-imports --no-strict-optional
 uv run code-review-graph build              # Full graph build
 uv run code-review-graph update             # Incremental update
 uv run code-review-graph status             # Show stats
-uv run code-review-graph serve              # Start MCP server
+uv run code-review-graph serve              # Start MCP server over stdio
+uv run code-review-graph serve --http       # Start streamable HTTP on localhost
 uv run code-review-graph wiki               # Generate markdown wiki
 uv run code-review-graph detect-changes     # Risk-scored change analysis
 uv run code-review-graph register <path>    # Register repo in multi-repo registry
 uv run code-review-graph repos              # List registered repos
 uv run code-review-graph eval               # Run evaluation benchmarks
+uv run crg-daemon status                    # Show multi-repo daemon status
 ```
 
 ## Code Conventions
@@ -78,34 +83,17 @@ uv run code-review-graph eval               # Run evaluation benchmarks
 - No `shell=True` in subprocess calls
 - `_validate_repo_root()` prevents path traversal via repo_root parameter
 - `_sanitize_name()` strips control characters, caps at 256 chars (prompt injection defense)
-- `escH()` in visualization escapes HTML entities including quotes and backticks
+- `escH()` in visualisation escapes HTML entities including quotes and backticks
 - SRI hash on D3.js CDN script tag
 - API keys only from environment variables, never hardcoded
+- Cloud embeddings warn on stderr before source-code metadata leaves the machine
 
 ## Test Structure
 
-- `tests/test_parser.py` — Parser correctness, cross-file resolution
-- `tests/test_graph.py` — Graph CRUD, stats, impact radius
-- `tests/test_tools.py` — MCP tool integration tests
-- `tests/test_visualization.py` — Export, HTML generation, C++ resolution
-- `tests/test_incremental.py` — Build, update, migration, git ops
-- `tests/test_multilang.py` — 19 language parsing tests (including Vue, Solidity, Dart, R, Perl, XS, Lua)
-- `tests/test_embeddings.py` — Vector encode/decode, similarity, store
-- `tests/test_flows.py` — Execution flow detection and criticality
-- `tests/test_communities.py` — Community detection, architecture overview
-- `tests/test_changes.py` — Risk-scored change analysis
-- `tests/test_refactor.py` — Rename preview, dead code, suggestions
-- `tests/test_search.py` — FTS5 hybrid search
-- `tests/test_hints.py` — Review hint generation
-- `tests/test_prompts.py` — MCP prompt template tests
-- `tests/test_wiki.py` — Wiki generation
-- `tests/test_skills.py` — Skill definitions
-- `tests/test_registry.py` — Multi-repo registry
-- `tests/test_migrations.py` — Database migrations
-- `tests/test_eval.py` — Evaluation framework
-- `tests/test_tsconfig_resolver.py` — TypeScript path resolution
-- `tests/test_integration_v2.py` — v2 pipeline integration test
-- `tests/fixtures/` — Sample files for each supported language
+- Parser and language coverage: parser, multilang, fixtures, notebooks, framework resolvers, and TypeScript path resolution.
+- Storage and update behaviour: graph, migrations, transactions, FTS sync, incremental updates, daemon, registry, and post-processing.
+- MCP and workflows: tools, prompts, hints, review context, change analysis, refactoring, wiki, search, flows, communities, and evaluation.
+- VS Code and visual output: visualisation, exports, and extension-side SQLite tests.
 
 ## CI Pipeline
 
@@ -173,11 +161,11 @@ scanning cannot.
 
 ### When to use graph tools FIRST
 
-- **Exploring code**: `semantic_search_nodes` or `query_graph` instead of Grep
-- **Understanding impact**: `get_impact_radius` instead of manually tracing imports
-- **Code review**: `detect_changes` + `get_review_context` instead of reading entire files
-- **Finding relationships**: `query_graph` with callers_of/callees_of/imports_of/tests_for
-- **Architecture questions**: `get_architecture_overview` + `list_communities`
+- **Exploring code**: `semantic_search_nodes_tool` or `query_graph_tool` instead of Grep
+- **Understanding impact**: `get_impact_radius_tool` instead of manually tracing imports
+- **Code review**: `detect_changes_tool` + `get_review_context_tool` instead of reading entire files
+- **Finding relationships**: `query_graph_tool` with callers_of/callees_of/imports_of/tests_for
+- **Architecture questions**: `get_architecture_overview_tool` + `list_communities_tool`
 
 Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 
@@ -185,18 +173,18 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 
 | Tool | Use when |
 |------|----------|
-| `detect_changes` | Reviewing code changes — gives risk-scored analysis |
-| `get_review_context` | Need source snippets for review — token-efficient |
-| `get_impact_radius` | Understanding blast radius of a change |
-| `get_affected_flows` | Finding which execution paths are impacted |
-| `query_graph` | Tracing callers, callees, imports, tests, dependencies |
-| `semantic_search_nodes` | Finding functions/classes by name or keyword |
-| `get_architecture_overview` | Understanding high-level codebase structure |
+| `detect_changes_tool` | Reviewing code changes; gives risk-scored analysis |
+| `get_review_context_tool` | Need source snippets for review; token-efficient |
+| `get_impact_radius_tool` | Understanding blast radius of a change |
+| `get_affected_flows_tool` | Finding which execution paths are impacted |
+| `query_graph_tool` | Tracing callers, callees, imports, tests, dependencies |
+| `semantic_search_nodes_tool` | Finding functions/classes by name or keyword |
+| `get_architecture_overview_tool` | Understanding high-level codebase structure |
 | `refactor_tool` | Planning renames, finding dead code |
 
 ### Workflow
 
 1. The graph auto-updates on file changes (via hooks).
-2. Use `detect_changes` for code review.
-3. Use `get_affected_flows` to understand impact.
-4. Use `query_graph` pattern="tests_for" to check coverage.
+2. Use `detect_changes_tool` for code review.
+3. Use `get_affected_flows_tool` to understand impact.
+4. Use `query_graph_tool` pattern="tests_for" to check coverage.

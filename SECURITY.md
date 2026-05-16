@@ -26,9 +26,10 @@ We will acknowledge receipt within 48 hours and aim to release a fix within 7 da
 ### Threat Surface
 
 code-review-graph is a **local development tool**. It:
-- Runs as a local MCP server via stdio (no network listener)
+- Runs as a local MCP server via stdio by default
+- Can run streamable HTTP on localhost when explicitly started with `serve --http`
 - Stores data in a local SQLite database (`.code-review-graph/graph.db`)
-- Makes no network calls during normal operation
+- Makes no network calls during normal graph build, update, query, or review work; optional cloud embeddings are the explicit exception
 - Only reads source files within the validated repository root
 
 ### Mitigations
@@ -38,17 +39,21 @@ code-review-graph is a **local development tool**. It:
 | SQL Injection | All queries use parameterized `?` placeholders |
 | Path Traversal | `_validate_repo_root()` requires `.git` or `.code-review-graph` directory |
 | Prompt Injection | `_sanitize_name()` strips control characters, caps at 256 chars |
-| XSS (visualization) | `escH()` escapes HTML entities; `</script>` escaped in JSON |
+| XSS (visualisation) | `escH()` escapes HTML entities; `</script>` escaped in JSON |
 | Subprocess Injection | No `shell=True`; all git commands use list arguments |
 | Supply Chain | Dependencies pinned with upper bounds; `uv.lock` has SHA256 hashes |
 | CDN Tampering | D3.js loaded with Subresource Integrity (SRI) hash |
-| API Key Leakage | Google API key loaded from env var only, never logged |
+| API Key Leakage | Cloud embedding API keys are loaded from environment variables only, never logged |
 
 ### Optional Network Calls
 
 - **Google Gemini embeddings**: Only when explicitly configured with `provider="google"` and `GOOGLE_API_KEY` env var
+- **MiniMax embeddings**: Only when explicitly configured with `provider="minimax"` and `MINIMAX_API_KEY` env var
+- **OpenAI-compatible embeddings**: Only when explicitly configured with `provider="openai"` and `CRG_OPENAI_BASE_URL`, `CRG_OPENAI_API_KEY`, and `CRG_OPENAI_MODEL`
 - **Local embeddings model download**: One-time download from HuggingFace on first use of `sentence-transformers`
 - **D3.js CDN**: Visualization HTML loads D3.js v7 from `d3js.org` (with SRI verification)
+
+Cloud embedding providers receive function names, docstrings, and file paths for embedded nodes. The tool prints a stderr warning before using a cloud provider unless `CRG_ACCEPT_CLOUD_EMBEDDINGS=1` is set. OpenAI-compatible endpoints on localhost are treated as local.
 
 ## Security Scanning
 

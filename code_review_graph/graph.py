@@ -1,7 +1,9 @@
 """SQLite-backed knowledge graph storage and query engine.
 
 Stores code structure as nodes (File, Class, Function, Type, Test) and
-edges (CALLS, IMPORTS_FROM, INHERITS, IMPLEMENTS, CONTAINS, TESTED_BY, DEPENDS_ON, REFERENCES).
+edges including CALLS, IMPORTS_FROM, INHERITS, IMPLEMENTS, CONTAINS,
+TESTED_BY, DEPENDS_ON, REFERENCES, INJECTS, TEMPORAL_STUB, CONSUMES,
+and PRODUCES.
 Supports impact-radius queries and subgraph extraction.
 """
 
@@ -1012,7 +1014,7 @@ class GraphStore:
     def get_all_community_ids(self) -> dict[str, int | None]:
         """Return a mapping of *all* qualified names to their community_id.
 
-        Used primarily by the visualization exporter.
+        Used primarily by the visualisation exporter.
         """
         try:
             rows = self._conn.execute(
@@ -1180,7 +1182,7 @@ class GraphStore:
             results.extend(r["source_qualified"] for r in rows)
         return results
 
-    # --- Public edge access (for visualization etc.) ---
+    # --- Public edge access (for visualisation etc.) ---
 
     def get_all_edges(self) -> list[GraphEdge]:
         """Return all edges in the graph."""

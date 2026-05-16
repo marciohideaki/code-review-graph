@@ -45,7 +45,7 @@ code-review-graph build            # コードベースを解析
 1つのコマンドですべてが完了します。`install` は使用中のAIコーディングツールを検出し、各ツールに適切なMCP設定を書き込み、プラットフォームルールにグラフ対応の指示を注入します。`uvx` と `pip`/`pipx` のどちらでインストールしたかを自動判別し、適切な設定を生成します。インストール後はエディタ/ツールを再起動してください。
 
 <p align="center">
-  <img src="diagrams/diagram8_supported_platforms.png" alt="ワンインストールで全プラットフォーム対応：Codex、Claude Code、Cursor、Windsurf、Zed、Continue、OpenCode、Antigravity、Kiroを自動検出" width="85%" />
+  <img src="diagrams/diagram8_supported_platforms.png" alt="ワンインストールで全プラットフォーム対応：Codex、Claude Code、Cursor、Windsurf、Zed、Continue、OpenCode、Antigravity、Gemini CLI、Qwen Code、Kiro、Qoder、GitHub Copilot、GitHub Copilot CLIを自動検出" width="85%" />
 </p>
 
 特定のプラットフォームのみを設定する場合：
@@ -54,7 +54,17 @@ code-review-graph build            # コードベースを解析
 code-review-graph install --platform codex       # Codexのみ設定
 code-review-graph install --platform cursor      # Cursorのみ設定
 code-review-graph install --platform claude-code  # Claude Codeのみ設定
+code-review-graph install --platform windsurf     # Windsurfのみ設定
+code-review-graph install --platform zed          # Zedのみ設定
+code-review-graph install --platform continue     # Continueのみ設定
+code-review-graph install --platform opencode     # OpenCodeのみ設定
+code-review-graph install --platform antigravity  # Antigravityのみ設定
+code-review-graph install --platform gemini-cli   # Gemini CLIのみ設定
+code-review-graph install --platform qwen         # Qwen Codeのみ設定
 code-review-graph install --platform kiro         # Kiroのみ設定
+code-review-graph install --platform qoder        # Qoderのみ設定
+code-review-graph install --platform copilot      # GitHub Copilotのみ設定
+code-review-graph install --platform copilot-cli  # GitHub Copilot CLIのみ設定
 ```
 
 Python 3.10以上が必要です。最良の体験のためには [uv](https://docs.astral.sh/uv/) のインストールを推奨します（MCP設定は利用可能な場合 `uvx` を使用し、そうでない場合は `code-review-graph` コマンドに直接フォールバックします）。
@@ -105,13 +115,13 @@ gitコミットやファイル保存のたびにフックが起動します。�
   <img src="diagrams/diagram6_monorepo_funnel.png" alt="Next.jsモノレポ：27,732ファイルをcode-review-graphで絞り込み、約15ファイルに - トークン49分の1" width="80%" />
 </p>
 
-### 23言語 + Jupyterノートブック対応
+### 56拡張子にわたる35言語ラベル対応
 
 <p align="center">
-  <img src="diagrams/diagram9_language_coverage.png" alt="カテゴリ別19言語：Web、バックエンド、システム、モバイル、スクリプト、さらにJupyter/Databricksノートブック対応" width="90%" />
+  <img src="diagrams/diagram9_language_coverage.png" alt="56拡張子にわたる35言語ラベルとJupyter/Databricksノートブック対応" width="90%" />
 </p>
 
-すべての言語で関数、クラス、インポート、呼び出し箇所、継承、テスト検出の完全なTree-sitter文法をサポート。Zig、PowerShell、Julia、Svelte SFCにも対応。さらにJupyter/Databricksノートブック（`.ipynb`）の多言語セル対応（Python、R、SQL）やPerl XSファイル（`.xs`）も解析可能です。
+関数、クラス、インポート、呼び出し箇所、継承、テスト検出のTree-sitter文法をサポートします。言語ラベルは Bash、C、C++、C#、Dart、Elixir、GDScript、Go、Java、JavaScript、Julia、Kotlin、Lua、Luau、Nix、Objective-C、Perl、PHP、PowerShell、Python、R、ReScript、Ruby、Rust、Scala、Solidity、SQL、Svelte、Swift、TSX、TypeScript、Verilog/SystemVerilog、Vue、Zig です。Jupyter/Databricksノートブック（`.ipynb`）の多言語セル（Python、R、SQL）やPerl XSファイル（`.xs`）も解析可能です。
 
 ---
 
@@ -132,7 +142,7 @@ gitコミットやファイル保存のたびにフックが起動します。�
 | 機能 | 詳細 |
 |------|------|
 | **インクリメンタル更新** | 変更されたファイルのみを再解析。更新は2秒以内に完了。 |
-| **23言語 + ノートブック** | Python, TypeScript/TSX, JavaScript, Vue, Svelte, Go, Rust, Java, Scala, C#, Ruby, Kotlin, Swift, PHP, Solidity, C/C++, Dart, R, Perl, Lua, Zig, PowerShell, Julia, Jupyter/Databricks (.ipynb) |
+| **56拡張子にわたる35言語ラベル** | Bash, C, C++, C#, Dart, Elixir, GDScript, Go, Java, JavaScript, Julia, Kotlin, Lua, Luau, Nix, Objective-C, Perl, PHP, PowerShell, Python, R, ReScript, Ruby, Rust, Scala, Solidity, SQL, Svelte, Swift, TSX, TypeScript, Verilog/SystemVerilog, Vue, Zig, Jupyter/Databricks (.ipynb) |
 | **影響範囲分析** | 変更によって影響を受ける関数、クラス、ファイルを正確に表示 |
 | **自動更新フック** | ファイル編集やgitコミットのたびに手動操作なしでグラフを更新 |
 | **セマンティック検索** | sentence-transformers、Google Gemini、MiniMax、またはOpenAI互換エンドポイント（本家OpenAI、Azure、new-api、LiteLLM、vLLM、LocalAI）によるオプションのベクトル埋め込み |
@@ -151,13 +161,13 @@ gitコミットやファイル保存のたびにフックが起動します。�
 | **実行フロー** | エントリーポイントからの呼び出しチェーンを重み付き重要度でソートしてトレース |
 | **コミュニティ検出** | Leidenアルゴリズムで関連コードをクラスタリング。大規模グラフ向け解像度スケーリング対応 |
 | **アーキテクチャ概要** | コミュニティ構造から自動生成されるアーキテクチャマップ（結合度警告付き） |
-| **リスクスコア付きレビュー** | `detect_changes` が差分を影響する関数、フロー、テストギャップにマッピング |
+| **リスクスコア付きレビュー** | `detect_changes_tool` が差分を影響する関数、フロー、テストギャップにマッピング |
 | **リファクタリングツール** | リネームプレビュー、フレームワーク対応のデッドコード検出、コミュニティ駆動の提案 |
 | **Wiki生成** | コミュニティ構造からMarkdown Wikiを自動生成 |
 | **マルチリポジトリ管理** | 複数リポジトリを登録し、横断検索が可能 |
 | **MCPプロンプト** | 5つのワークフローテンプレート：レビュー、アーキテクチャ、デバッグ、オンボーディング、マージ前チェック |
 | **全文検索** | FTS5によるハイブリッド検索（キーワードとベクトル類似度の組み合わせ） |
-| **ローカルストレージ** | `.code-review-graph/` 内のSQLiteファイル。外部DB不要、クラウド依存なし。 |
+| **ローカルストレージ** | `.code-review-graph/` 内のSQLiteファイル。外部DBは不要です。クラウド呼び出しはクラウド埋め込みproviderを選んだ場合だけ発生します。 |
 | **ウォッチモード** | 作業中にグラフを継続的に更新 |
 
 ---
@@ -204,7 +214,7 @@ code-review-graph serve            # MCPサーバーの起動
 </details>
 
 <details>
-<summary><strong>28のMCPツール</strong></summary>
+<summary><strong>30のMCPツール</strong></summary>
 <br>
 
 グラフのビルド後、AIアシスタントがこれらのツールを自動的に使用します。
@@ -212,6 +222,7 @@ code-review-graph serve            # MCPサーバーの起動
 | ツール | 説明 |
 |--------|------|
 | `build_or_update_graph_tool` | グラフのビルドまたはインクリメンタル更新 |
+| `run_postprocess_tool` | 既存グラフでシグネチャ、フロー、コミュニティ、全文検索インデックスを再実行 |
 | `get_minimal_context_tool` | 超コンパクトなコンテキスト（約100トークン） -- 最初にこれを呼び出す |
 | `get_impact_radius_tool` | 変更ファイルの影響範囲 |
 | `get_review_context_tool` | 構造サマリー付きトークン最適化レビューコンテキスト |
@@ -269,10 +280,11 @@ pip install code-review-graph[google-embeddings]   # Google Gemini埋め込み
 pip install code-review-graph[communities]         # コミュニティ検出 (igraph)
 pip install code-review-graph[eval]                # 評価ベンチマーク (matplotlib)
 pip install code-review-graph[wiki]                # LLMサマリー付きWiki生成 (ollama)
+pip install code-review-graph[enrichment]          # コードエンリッチメント (tree-sitter-languages)
 pip install code-review-graph[all]                 # 全オプション依存
 ```
 
-OpenAI互換の埋め込み（本家OpenAI、Azure、または自前のゲートウェイ: new-api / LiteLLM / vLLM / LocalAI / Ollama openaiモード）は追加インストール不要です。環境変数を設定し、`embed_graph` に `provider="openai"` を渡すだけで動作します：
+OpenAI互換の埋め込み（本家OpenAI、Azure、または自前のゲートウェイ: new-api / LiteLLM / vLLM / LocalAI / Ollama openaiモード）は追加インストール不要です。環境変数を設定し、`embed_graph_tool` に `provider="openai"` を渡すだけで動作します：
 
 ```bash
 export CRG_OPENAI_BASE_URL=http://127.0.0.1:3000/v1     # または https://api.openai.com/v1

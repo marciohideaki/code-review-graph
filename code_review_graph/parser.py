@@ -1,7 +1,7 @@
 """Tree-sitter based multi-language code parser.
 
-Extracts structural nodes (classes, functions, imports, types) and edges
-(calls, inheritance, contains) from source files.
+Extracts structural nodes (classes, functions, imports, types) and structural
+or inferred edges from source files.
 """
 
 from __future__ import annotations
@@ -67,7 +67,8 @@ class NodeInfo:
 @dataclass
 class EdgeInfo:
     # CALLS, IMPORTS_FROM, INHERITS, IMPLEMENTS, CONTAINS,
-    # TESTED_BY, DEPENDS_ON, REFERENCES
+    # TESTED_BY, DEPENDS_ON, REFERENCES, INJECTS,
+    # TEMPORAL_STUB, CONSUMES, PRODUCES
     kind: str
     source: str  # qualified name or path
     target: str  # qualified name or path

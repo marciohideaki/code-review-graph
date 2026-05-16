@@ -8,7 +8,7 @@ argument-hint: "[file or function name]"
 
 Perform a focused, token-efficient code review of only the changed code and its blast radius.
 
-**Token optimization:** Before starting, call `get_docs_section_tool(section_name="review-delta")` for the optimized workflow. Use ONLY changed nodes + 2-hop neighbors in context.
+**Token optimisation:** Before starting, call `get_docs_section_tool(section_name="review-delta")` for the optimised workflow. Use only changed nodes and 2-hop neighbours in context.
 
 ## Steps
 
@@ -20,8 +20,8 @@ Perform a focused, token-efficient code review of only the changed code and its 
    - Source code snippets for changed areas
    - Review guidance (test coverage gaps, wide impact warnings, inheritance concerns)
 
-3. **Analyze the blast radius** by reviewing the `impacted_nodes` and `impacted_files` in the context. Focus on:
-   - Functions whose callers changed (may need signature/behavior verification)
+3. **Analyse the blast radius** by reviewing the `impacted_nodes` and `impacted_files` in the context. Focus on:
+   - Functions whose callers changed (may need signature or behaviour verification)
    - Classes with inheritance changes (Liskov substitution concerns)
    - Files with many dependents (high-risk changes)
 

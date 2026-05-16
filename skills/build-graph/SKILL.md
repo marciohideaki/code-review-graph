@@ -1,6 +1,6 @@
 ---
 name: build-graph
-description: Build or update the code review knowledge graph. Run this first to initialize, or let hooks keep it updated automatically.
+description: Build or update the code review knowledge graph. Run this first to initialise, or let hooks keep it updated automatically.
 argument-hint: "[full]"
 ---
 
@@ -35,4 +35,4 @@ Build or incrementally update the persistent code knowledge graph for this repos
 
 - The graph is stored as a SQLite database (`.code-review-graph/graph.db`) in the repo root
 - Binary files, generated files, and patterns in `.code-review-graphignore` are skipped
-- Supported languages: Python, TypeScript/JavaScript, Vue, Go, Rust, Java, Scala, C#, Ruby, Kotlin, Swift, PHP, Solidity, C/C++
+- Supported language labels: Bash, C, C++, C#, Dart, Elixir, GDScript, Go, Java, JavaScript, Julia, Kotlin, Lua, Luau, Nix, notebooks, Objective-C, Perl, PHP, PowerShell, Python, R, ReScript, Ruby, Rust, Scala, Solidity, SQL, Svelte, Swift, TSX, TypeScript, Verilog/SystemVerilog, Vue, and Zig

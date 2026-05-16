@@ -2,142 +2,40 @@
 
 ## Node Types
 
-### File
-Represents a source code file.
+| Kind | Meaning |
+|------|---------|
+| `File` | Source file with path, language, line range, and file hash |
+| `Class` | Class, struct, interface, enum, module, contract, or similar named container |
+| `Function` | Function, method, constructor, task, procedure, binding, or equivalent callable |
+| `Type` | Type alias, interface, enum, or language-specific type declaration |
+| `Test` | Test function or method, stored with `is_test = true` |
 
-| Property | Type | Description |
-|----------|------|-------------|
-| name | string | Absolute file path |
-| file_path | string | Same as name for File nodes |
-| language | string | Detected language (python, typescript, go, etc.) |
-| line_start | int | Always 1 |
-| line_end | int | Total line count |
-| file_hash | string | SHA-256 of file contents (for change detection) |
+Common node fields are `name`, `qualified_name`, `file_path`, `line_start`, `line_end`, `language`, `parent_name`, `params`, `return_type`, `modifiers`, `is_test`, `file_hash`, `extra`, `updated_at`, `signature`, and `community_id`.
 
-### Class
-Represents a class, struct, interface, enum, or module definition.
-
-| Property | Type | Description |
-|----------|------|-------------|
-| name | string | Class name |
-| file_path | string | File containing the class |
-| line_start | int | Definition start line |
-| line_end | int | Definition end line |
-| language | string | Source language |
-| parent_name | string? | Enclosing class (for nested classes) |
-| modifiers | string? | Access modifiers (public, abstract, etc.) |
-
-### Function
-Represents a function, method, or constructor definition.
-
-| Property | Type | Description |
-|----------|------|-------------|
-| name | string | Function name |
-| file_path | string | File containing the function |
-| line_start | int | Definition start line |
-| line_end | int | Definition end line |
-| language | string | Source language |
-| parent_name | string? | Enclosing class (for methods) |
-| params | string? | Parameter list as source text |
-| return_type | string? | Return type annotation |
-| is_test | bool | Whether this is a test function |
-
-### Test
-Same schema as Function, but `kind = "Test"` and `is_test = true`. Identified by:
-- Name starts with `test_` or `Test`
-- Name ends with `_test` or `_spec`
-- File matches test file patterns (`test_*.py`, `*.test.ts`, `*_test.go`, etc.)
-
-### Type
-Represents a type alias, interface, or enum definition (primarily for TypeScript, Go, Rust).
-
-| Property | Type | Description |
-|----------|------|-------------|
-| name | string | Type name |
-| file_path | string | File containing the type |
-| line_start | int | Definition start line |
-| line_end | int | Definition end line |
+Qualified names use absolute file paths for files and `file_path::symbol` for contained symbols, for example `/repo/src/auth.py::AuthService.login`.
 
 ## Edge Types
 
-### CALLS
-A function calls another function.
+| Kind | Meaning |
+|------|---------|
+| `CALLS` | A function, method, module scope, or equivalent callable invokes another symbol |
+| `IMPORTS_FROM` | A file or symbol imports, opens, sources, includes, or otherwise refers to another module or file |
+| `INHERITS` | A class or type extends another class or base type |
+| `IMPLEMENTS` | A class or type implements an interface or protocol |
+| `CONTAINS` | A file contains a symbol, or a container contains a nested symbol |
+| `TESTED_BY` | A production symbol is covered by a test symbol |
+| `DEPENDS_ON` | A general dependency when a more specific edge kind is not appropriate |
+| `REFERENCES` | A symbol is referenced as a value, such as a callback or dispatch-table entry |
+| `INJECTS` | Java Spring dependency injection connects an owner to an injected type |
+| `TEMPORAL_STUB` | Java Temporal workflow or activity stub field points to an interface |
+| `CONSUMES` | Kafka consumer code consumes from a topic |
+| `PRODUCES` | Kafka producer code produces to a topic |
 
-| Property | Type | Description |
-|----------|------|-------------|
-| source | string | Qualified name of the caller |
-| target | string | Name of the called function (may be unqualified) |
-| file_path | string | File where the call occurs |
-| line | int | Line number of the call |
+Edges include `confidence` and `confidence_tier`. Confidence tiers are `EXTRACTED`, `INFERRED`, and `AMBIGUOUS`.
 
-### IMPORTS_FROM
-A file imports from another module or file.
-
-| Property | Type | Description |
-|----------|------|-------------|
-| source | string | Importing file path |
-| target | string | Imported module/path |
-| file_path | string | Same as source |
-| line | int | Line number of the import |
-
-### INHERITS
-A class extends/inherits from another class.
-
-| Property | Type | Description |
-|----------|------|-------------|
-| source | string | Child class qualified name |
-| target | string | Parent class name |
-| file_path | string | File containing the child class |
-
-### IMPLEMENTS
-A class implements an interface (Java, C#, TypeScript, Go).
-
-| Property | Type | Description |
-|----------|------|-------------|
-| source | string | Implementing class |
-| target | string | Interface name |
-
-### CONTAINS
-Structural containment: a file contains a class, a class contains a method.
-
-| Property | Type | Description |
-|----------|------|-------------|
-| source | string | Container (file path or class qualified name) |
-| target | string | Contained node qualified name |
-
-### TESTED_BY
-A function is tested by a test function.
-
-| Property | Type | Description |
-|----------|------|-------------|
-| source | string | Function being tested |
-| target | string | Test function qualified name |
-
-### DEPENDS_ON
-General dependency relationship (used for non-specific dependencies).
-
-## Qualified Name Format
-
-Nodes are uniquely identified by qualified names:
-
-```
-# File node
-/absolute/path/to/file.py
-
-# Top-level function
-/absolute/path/to/file.py::function_name
-
-# Method in a class
-/absolute/path/to/file.py::ClassName.method_name
-
-# Nested class method
-/absolute/path/to/file.py::OuterClass.InnerClass.method_name
-```
-
-## SQLite Tables
+## Core SQLite Tables
 
 ```sql
--- Nodes table
 CREATE TABLE nodes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     kind TEXT NOT NULL,
@@ -154,10 +52,11 @@ CREATE TABLE nodes (
     is_test INTEGER DEFAULT 0,
     file_hash TEXT,
     extra TEXT DEFAULT '{}',
-    updated_at REAL NOT NULL
+    updated_at REAL NOT NULL,
+    signature TEXT,
+    community_id INTEGER
 );
 
--- Edges table
 CREATE TABLE edges (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     kind TEXT NOT NULL,
@@ -166,16 +65,22 @@ CREATE TABLE edges (
     file_path TEXT NOT NULL,
     line INTEGER DEFAULT 0,
     extra TEXT DEFAULT '{}',
+    confidence REAL DEFAULT 1.0,
+    confidence_tier TEXT DEFAULT 'EXTRACTED',
     updated_at REAL NOT NULL
 );
 
--- Metadata table
 CREATE TABLE metadata (
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
+```
 
--- Flows table (v2.0)
+Indexes cover node file, kind, qualified name, community, edge source, edge target, edge kind, edge source/kind, edge target/kind, edge file, and the composite edge identity used for upserts.
+
+## Post-Processing Tables
+
+```sql
 CREATE TABLE flows (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -189,7 +94,6 @@ CREATE TABLE flows (
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Flow memberships table (v2.0)
 CREATE TABLE flow_memberships (
     flow_id INTEGER NOT NULL,
     node_id INTEGER NOT NULL,
@@ -197,7 +101,6 @@ CREATE TABLE flow_memberships (
     PRIMARY KEY (flow_id, node_id)
 );
 
--- Communities table (v2.0)
 CREATE TABLE communities (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -210,12 +113,54 @@ CREATE TABLE communities (
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Full-text search virtual table (v2.0)
 CREATE VIRTUAL TABLE nodes_fts USING fts5(
     name, qualified_name, file_path, signature,
     content='nodes', content_rowid='rowid',
     tokenize='porter unicode61'
 );
+
+CREATE TABLE community_summaries (
+    community_id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    purpose TEXT DEFAULT '',
+    key_symbols TEXT DEFAULT '[]',
+    risk TEXT DEFAULT 'unknown',
+    size INTEGER DEFAULT 0,
+    dominant_language TEXT DEFAULT ''
+);
+
+CREATE TABLE flow_snapshots (
+    flow_id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    entry_point TEXT NOT NULL,
+    critical_path TEXT DEFAULT '[]',
+    criticality REAL DEFAULT 0.0,
+    node_count INTEGER DEFAULT 0,
+    file_count INTEGER DEFAULT 0
+);
+
+CREATE TABLE risk_index (
+    node_id INTEGER PRIMARY KEY,
+    qualified_name TEXT NOT NULL,
+    risk_score REAL DEFAULT 0.0,
+    caller_count INTEGER DEFAULT 0,
+    test_coverage TEXT DEFAULT 'unknown',
+    security_relevant INTEGER DEFAULT 0,
+    last_computed TEXT DEFAULT ''
+);
 ```
 
-The `nodes` table also has a `community_id INTEGER` column (added via migration v4) linking nodes to their detected community.
+## Embeddings Store
+
+Embeddings are stored in a separate SQLite table keyed by qualified name:
+
+```sql
+CREATE TABLE embeddings (
+    qualified_name TEXT PRIMARY KEY,
+    vector BLOB NOT NULL,
+    text_hash TEXT NOT NULL,
+    provider TEXT NOT NULL DEFAULT 'unknown'
+);
+```
+
+The provider field partitions local, Google, MiniMax, and OpenAI-compatible embeddings. For OpenAI-compatible endpoints, the provider identity includes model and endpoint host/path to avoid mixing vector spaces.

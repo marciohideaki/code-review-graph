@@ -1,308 +1,128 @@
-# All Available Commands
+# Commands And MCP Reference
 
-## Skills (Claude Code slash commands)
+## Platform Skills
 
-### `/code-review-graph:build-graph`
-Build or update the knowledge graph.
-- First time: performs a full build
-- Subsequent: incremental update (only changed files)
+The repository ships seven checked-in skill documents in `skills/`: `build-graph`, `review-delta`, `review-pr`, `explore-codebase`, `review-changes`, `debug-issue`, and `refactor-safely`.
 
-### `/code-review-graph:review-delta`
-Review only changes since last commit.
-- Auto-detects changed files via git diff
-- Computes blast radius (2-hop default)
-- Generates structured review with guidance
+The installer also generates four Claude Code skills from `code_review_graph/skills.py`: Explore Codebase, Review Changes, Debug Issue, and Refactor Safely. Gemini CLI receives the same four generated skills under `.gemini/skills/`. Qoder receives the checked-in skill documents under `.qoder/skills/`.
 
-### `/code-review-graph:review-pr`
-Review a PR or branch diff.
-- Uses main/master as base
-- Full impact analysis across all PR commits
-- Structured output with risk assessment
+## MCP Tools
 
-## MCP Tools (22 total)
+`code-review-graph` exposes 30 MCP tools by default.
 
-### Core Tools
+### Build And Context
 
-#### `build_or_update_graph_tool`
-```
-full_rebuild: bool = False    # True for full re-parse
-repo_root: str | None         # Auto-detected
-base: str = "HEAD~1"          # Git diff base
-```
+| Tool | Key parameters | Use |
+|------|----------------|-----|
+| `build_or_update_graph_tool` | `full_rebuild`, `repo_root`, `base`, `postprocess`, `recurse_submodules` | Build or incrementally update the graph |
+| `run_postprocess_tool` | `flows`, `communities`, `fts`, `repo_root` | Re-run signatures, FTS, flow detection, and community detection |
+| `get_minimal_context_tool` | `task`, `changed_files`, `repo_root`, `base` | Return compact task context and suggested next tools |
+| `get_docs_section_tool` | `section_name`, `repo_root` | Fetch one section from the LLM reference |
 
-#### `get_impact_radius_tool`
-```
-changed_files: list[str] | None  # Auto-detected from git
-max_depth: int = 2               # Hops in graph
-repo_root: str | None
-base: str = "HEAD~1"
-```
+### Query And Search
 
-#### `query_graph_tool`
-```
-pattern: str    # callers_of, callees_of, imports_of, importers_of,
-                # children_of, tests_for, inheritors_of, file_summary
-target: str     # Node name, qualified name, or file path
-repo_root: str | None
-```
+| Tool | Key parameters | Use |
+|------|----------------|-----|
+| `get_impact_radius_tool` | `changed_files`, `max_depth`, `repo_root`, `base`, `detail_level` | Show blast radius for changed files |
+| `query_graph_tool` | `pattern`, `target`, `repo_root`, `detail_level` | Run callers, callees, imports, tests, inheritance, children, or file summary queries |
+| `semantic_search_nodes_tool` | `query`, `kind`, `limit`, `repo_root`, `model`, `provider`, `detail_level` | Search entities by keyword or vector similarity |
+| `traverse_graph_tool` | `query`, `mode`, `depth`, `token_budget`, `repo_root` | Traverse from a best-matching node with BFS or DFS |
+| `find_large_functions_tool` | `min_lines`, `kind`, `file_path_pattern`, `limit`, `repo_root` | Find large files, classes, functions, or tests |
+| `list_graph_stats_tool` | `repo_root` | Show graph totals, language list, and freshness |
 
-#### `get_review_context_tool`
-```
-changed_files: list[str] | None
-max_depth: int = 2
-include_source: bool = True
-max_lines_per_file: int = 200
-repo_root: str | None
-base: str = "HEAD~1"
-```
+### Review, Flows, And Architecture
 
-#### `semantic_search_nodes_tool`
-```
-query: str           # Search string
-kind: str | None     # File, Class, Function, Type, Test
-limit: int = 20
-repo_root: str | None
-model: str | None    # Embedding model (falls back to CRG_EMBEDDING_MODEL env var)
-```
+| Tool | Key parameters | Use |
+|------|----------------|-----|
+| `get_review_context_tool` | `changed_files`, `max_depth`, `include_source`, `max_lines_per_file`, `repo_root`, `base`, `detail_level` | Return review-focused context for changed files |
+| `detect_changes_tool` | `base`, `changed_files`, `include_source`, `max_depth`, `repo_root`, `detail_level` | Produce risk-scored change analysis |
+| `list_flows_tool` | `sort_by`, `limit`, `kind`, `detail_level`, `repo_root` | List execution flows |
+| `get_flow_tool` | `flow_id`, `flow_name`, `include_source`, `repo_root` | Show a single execution flow |
+| `get_affected_flows_tool` | `changed_files`, `base`, `repo_root` | Find flows affected by changed files |
+| `list_communities_tool` | `sort_by`, `min_size`, `detail_level`, `repo_root` | List detected communities |
+| `get_community_tool` | `community_name`, `community_id`, `include_members`, `repo_root` | Show one community |
+| `get_architecture_overview_tool` | `repo_root` | Summarise communities and coupling |
 
-#### `embed_graph_tool`
-```
-repo_root: str | None
-model: str | None    # Embedding model name
-```
-Requires: `pip install code-review-graph[embeddings]`
+### Analysis, Refactoring, Wiki, And Multi-Repo
 
-#### `list_graph_stats_tool`
-```
-repo_root: str | None
-```
+| Tool | Key parameters | Use |
+|------|----------------|-----|
+| `get_hub_nodes_tool` | `top_n`, `repo_root` | Find highly connected nodes |
+| `get_bridge_nodes_tool` | `top_n`, `repo_root` | Find architectural chokepoints |
+| `get_knowledge_gaps_tool` | `repo_root` | Identify isolated nodes, thin communities, and untested hotspots |
+| `get_surprising_connections_tool` | `top_n`, `repo_root` | Score unexpected architectural coupling |
+| `get_suggested_questions_tool` | `repo_root` | Generate review questions from graph signals |
+| `refactor_tool` | `mode`, `old_name`, `new_name`, `kind`, `file_pattern`, `repo_root` | Preview renames, find dead code, or suggest refactors |
+| `apply_refactor_tool` | `refactor_id`, `repo_root`, `dry_run` | Apply or dry-run a previewed refactor |
+| `generate_wiki_tool` | `repo_root`, `force` | Generate markdown wiki pages |
+| `get_wiki_page_tool` | `community_name`, `repo_root` | Read one generated wiki page |
+| `list_repos_tool` | none | List registered repositories |
+| `cross_repo_search_tool` | `query`, `kind`, `limit` | Search all registered repositories |
+| `embed_graph_tool` | `repo_root`, `model`, `provider` | Compute embeddings for semantic search |
 
-#### `find_large_functions_tool`
-```
-min_lines: int = 50                # Minimum line count threshold
-kind: str | None                   # File, Class, Function, or Test
-file_path_pattern: str | None      # Filter by file path substring
-limit: int = 50                    # Max results to return
-repo_root: str | None
-```
+Embedding providers are `local`, `google`, `minimax`, and `openai`. The local provider needs `code-review-graph[embeddings]`. Google needs `GOOGLE_API_KEY`; MiniMax needs `MINIMAX_API_KEY`; OpenAI-compatible providers need `CRG_OPENAI_BASE_URL`, `CRG_OPENAI_API_KEY`, and `CRG_OPENAI_MODEL`.
 
-#### `get_docs_section_tool`
-```
-section_name: str    # usage, review-delta, review-pr, commands, legal, watch, embeddings, languages, troubleshooting
-```
+## MCP Prompts
 
-### Flow Tools
-
-#### `list_flows_tool`
-```
-sort_by: str = "criticality"  # criticality, depth, node_count, file_count, name
-limit: int = 50
-kind: str | None              # Filter by entry point kind (e.g. "Test", "Function")
-repo_root: str | None
-```
-
-#### `get_flow_tool`
-```
-flow_id: int | None          # Database ID from list_flows_tool
-flow_name: str | None        # Name to search (partial match)
-include_source: bool = False # Include source snippets for each step
-repo_root: str | None
-```
-
-#### `get_affected_flows_tool`
-```
-changed_files: list[str] | None  # Auto-detected from git
-base: str = "HEAD~1"
-repo_root: str | None
-```
-
-### Community Tools
-
-#### `list_communities_tool`
-```
-sort_by: str = "size"    # size, cohesion, name
-min_size: int = 0
-repo_root: str | None
-```
-
-#### `get_community_tool`
-```
-community_name: str | None   # Name to search (partial match)
-community_id: int | None     # Database ID
-include_members: bool = False
-repo_root: str | None
-```
-
-#### `get_architecture_overview_tool`
-```
-repo_root: str | None
-```
-
-### Change Analysis and Refactoring Tools
-
-#### `detect_changes_tool`
-```
-base: str = "HEAD~1"
-changed_files: list[str] | None
-include_source: bool = False
-max_depth: int = 2
-repo_root: str | None
-```
-Primary tool for code review. Maps git diffs to affected functions, flows, communities, and test coverage gaps. Returns risk scores and prioritized review items.
-
-#### `refactor_tool`
-```
-mode: str = "rename"         # "rename", "dead_code", or "suggest"
-old_name: str | None         # (rename) Current symbol name
-new_name: str | None         # (rename) New name
-kind: str | None             # (dead_code) Function or Class
-file_pattern: str | None     # (dead_code) Filter by file path substring
-repo_root: str | None
-```
-
-#### `apply_refactor_tool`
-```
-refactor_id: str             # ID from prior refactor_tool call
-repo_root: str | None
-```
-
-### Wiki Tools
-
-#### `generate_wiki_tool`
-```
-repo_root: str | None
-force: bool = False          # Regenerate all pages even if unchanged
-```
-
-#### `get_wiki_page_tool`
-```
-community_name: str          # Community name to look up
-repo_root: str | None
-```
-
-### Multi-Repo Tools
-
-#### `list_repos_tool`
-```
-(no parameters)
-```
-
-#### `cross_repo_search_tool`
-```
-query: str
-kind: str | None
-limit: int = 20
-```
-
-## MCP Prompts (5 workflow templates)
-
-### `review_changes`
-Pre-commit review workflow using detect_changes, affected_flows, and test gaps.
-```
-base: str = "HEAD~1"
-```
-
-### `architecture_map`
-Architecture documentation using communities, flows, and Mermaid diagrams.
-
-### `debug_issue`
-Guided debugging using search, flow tracing, and recent changes.
-```
-description: str = ""
-```
-
-### `onboard_developer`
-New developer orientation using stats, architecture, and critical flows.
-
-### `pre_merge_check`
-PR readiness check with risk scoring, test gaps, and dead code detection.
-```
-base: str = "HEAD~1"
-```
+| Prompt | Use |
+|--------|-----|
+| `review_changes` | Pre-commit review workflow using change analysis, affected flows, and test gaps |
+| `architecture_map` | Architecture documentation using communities, flows, and Mermaid diagrams |
+| `debug_issue` | Guided debugging using search, flow tracing, and recent changes |
+| `onboard_developer` | New developer orientation using stats, architecture, and critical flows |
+| `pre_merge_check` | PR readiness check with risk scoring, test gaps, and dead code detection |
 
 ## CLI Commands
 
 ```bash
-# Setup
-code-review-graph install           # Register MCP server with Claude Code (alias: init)
-code-review-graph install --dry-run # Preview without writing files
+code-review-graph install [--platform NAME] [--dry-run] [--no-skills] [--no-hooks] [--no-instructions] [-y]
+code-review-graph init [same options as install]
 
-# Build and update
-code-review-graph build                        # Full build
-code-review-graph update                       # Incremental update
-code-review-graph update --base origin/main    # Custom base ref
+code-review-graph build [--repo PATH] [--skip-flows] [--skip-postprocess] [--data-dir PATH]
+code-review-graph update [--base REF] [--repo PATH] [--skip-flows] [--skip-postprocess] [--data-dir PATH]
+code-review-graph postprocess [--repo PATH] [--no-flows] [--no-communities] [--no-fts] [--data-dir PATH]
 
-# Monitor and inspect
-code-review-graph status                       # Graph statistics
-code-review-graph watch                        # Auto-update on file changes
-code-review-graph visualize                    # Generate interactive HTML graph
+code-review-graph status [--repo PATH] [--data-dir PATH]
+code-review-graph watch [--repo PATH] [--data-dir PATH]
+code-review-graph detect-changes [--base REF] [--brief] [--repo PATH]
 
-# Analysis
-code-review-graph detect-changes               # Risk-scored change analysis
-code-review-graph detect-changes --base HEAD~3 # Custom base ref
-code-review-graph detect-changes --brief       # Compact output
+code-review-graph visualize [--repo PATH] [--mode auto|full|community|file] [--serve] [--format html|graphml|cypher|obsidian|svg] [--data-dir PATH]
+code-review-graph wiki [--repo PATH] [--force] [--data-dir PATH]
 
-# Wiki
-code-review-graph wiki                         # Generate markdown wiki from communities
+code-review-graph serve [--repo PATH] [--auto-watch] [--tools TOOL,TOOL] [--http] [--host ADDR] [--port PORT]
+code-review-graph mcp [--repo PATH] [--auto-watch]
 
-# Multi-repo
-code-review-graph register <path> [--alias name]  # Register a repository
-code-review-graph unregister <path_or_alias>       # Remove from registry
-code-review-graph repos                            # List registered repositories
+code-review-graph register PATH [--alias NAME]
+code-review-graph unregister PATH_OR_ALIAS
+code-review-graph repos
 
-# Daemon (multi-repo watcher) — included with install, no extra dependencies
-code-review-graph daemon start [--foreground]       # Start the watch daemon
-code-review-graph daemon stop                       # Stop the daemon
-code-review-graph daemon restart [--foreground]     # Restart the daemon
-code-review-graph daemon status                     # Show daemon status and repos
-code-review-graph daemon logs [--repo ALIAS] [-f]   # View daemon or per-repo logs
-code-review-graph daemon add <path> [--alias NAME]  # Add a repo to daemon config
-code-review-graph daemon remove <path_or_alias>     # Remove a repo from daemon config
-
-# Evaluation
-code-review-graph eval                         # Run evaluation benchmarks
-
-# Server
-code-review-graph serve                        # Start MCP server (stdio)
+code-review-graph eval [--benchmark NAME[,NAME]] [--repo NAME[,NAME]] [--all] [--report] [--output-dir PATH]
 ```
 
-## Standalone Daemon CLI (`crg-daemon`)
+The 14 named `install --platform` targets are `codex`, `claude-code`, `cursor`, `windsurf`, `zed`, `continue`, `opencode`, `antigravity`, `gemini-cli`, `qwen`, `kiro`, `qoder`, `copilot`, and `copilot-cli`. The CLI also accepts `claude` as an alias for Claude Code and `all` for automatic detection.
 
-The `crg-daemon` command is included with every `code-review-graph` installation — no
-separate install required. It is also available as a standalone entry point. It mirrors the
-`code-review-graph daemon` subcommands:
+The `serve` command uses stdio by default. `serve --http` starts streamable HTTP on `127.0.0.1:5555` unless `--host` or `--port` is supplied.
+
+## Daemon Commands
+
+`crg-daemon` is a standalone entry point for the same multi-repo watcher managed by `code-review-graph daemon`.
 
 ```bash
-crg-daemon start [--foreground]       # Start the multi-repo watch daemon
-crg-daemon stop                       # Stop the daemon and all watcher processes
-crg-daemon restart [--foreground]     # Restart (stop + start)
-crg-daemon status                     # Show daemon status, repos, and process liveness
-crg-daemon logs [--repo ALIAS] [-f] [-n N]  # Tail daemon or per-repo log files
-crg-daemon add <path> [--alias NAME]  # Add a repository to watch.toml
-crg-daemon remove <path_or_alias>     # Remove a repository from watch.toml
+code-review-graph daemon start [--foreground]
+code-review-graph daemon stop
+code-review-graph daemon restart [--foreground]
+code-review-graph daemon status
+code-review-graph daemon logs [--repo ALIAS] [--follow] [--lines N]
+code-review-graph daemon add PATH [--alias NAME]
+code-review-graph daemon remove PATH_OR_ALIAS
+
+crg-daemon start [--foreground]
+crg-daemon stop
+crg-daemon restart [--foreground]
+crg-daemon status
+crg-daemon logs [--repo ALIAS] [-f] [-n N]
+crg-daemon add PATH [--alias NAME]
+crg-daemon remove PATH_OR_ALIAS
 ```
 
-### Configuration
-
-The daemon reads its configuration from `~/.code-review-graph/watch.toml`:
-
-```toml
-session_name = "crg-watch"   # logical daemon name
-log_dir = "~/.code-review-graph/logs"
-poll_interval = 2            # seconds between config file polls
-
-[[repos]]
-path = "/home/user/project-a"
-alias = "project-a"
-
-[[repos]]
-path = "/home/user/project-b"
-alias = "project-b"
-```
-
-The daemon spawns one `code-review-graph watch` child process per repo,
-managed via `subprocess.Popen`. It monitors the config file for changes and
-automatically reconciles child processes (starting/stopping as repos are
-added or removed). Health checks run every 30 seconds and automatically
-restart dead watchers. No external dependencies (tmux, screen, etc.) are
-required.
+The daemon reads `~/.code-review-graph/watch.toml`, starts one `code-review-graph watch` child process per repository, watches the config file for changes, and restarts dead watchers during health checks.

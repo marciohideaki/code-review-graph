@@ -1,9 +1,8 @@
-"""Claude Code skills and hooks auto-install.
+"""Platform config, hooks, skills, and instruction snippets.
 
-Generates Claude Code agent skill files, hooks configuration, and
-CLAUDE.md integration for seamless code-review-graph usage.
-Also supports multi-platform MCP server installation and
-Cursor hooks / OpenCode plugin generation.
+Installs MCP server configuration for supported AI coding tools and generates
+platform-native hooks, skills, plugins, and guidance files so clients use
+code-review-graph MCP tools before broad file scans.
 """
 
 from __future__ import annotations
@@ -352,7 +351,7 @@ def install_platform_configs(
                 existing = json.loads(stripped)
             except (json.JSONDecodeError, OSError):
                 print(f"  {plat['name']}: {config_path} contains "
-                      f"unparseable JSON — skipping to avoid data loss. "
+                      f"unparseable JSON: skipping to avoid data loss. "
                       f"Please add the MCP config manually.")
                 continue
 
@@ -401,20 +400,20 @@ _SKILLS: dict[str, dict[str, str]] = {
             "## Explore Codebase\n\n"
             "Use the code-review-graph MCP tools to explore and understand the codebase.\n\n"
             "### Steps\n\n"
-            "1. Run `list_graph_stats` to see overall codebase metrics.\n"
-            "2. Run `get_architecture_overview` for high-level community structure.\n"
-            "3. Use `list_communities` to find major modules, then `get_community` "
+            "1. Run `list_graph_stats_tool` to see overall codebase metrics.\n"
+            "2. Run `get_architecture_overview_tool` for high-level community structure.\n"
+            "3. Use `list_communities_tool` to find major modules, then `get_community_tool` "
             "for details.\n"
-            "4. Use `semantic_search_nodes` to find specific functions or classes.\n"
-            "5. Use `query_graph` with patterns like `callers_of`, `callees_of`, "
+            "4. Use `semantic_search_nodes_tool` to find specific functions or classes.\n"
+            "5. Use `query_graph_tool` with patterns like `callers_of`, `callees_of`, "
             "`imports_of` to trace relationships.\n"
-            "6. Use `list_flows` and `get_flow` to understand execution paths.\n\n"
+            "6. Use `list_flows_tool` and `get_flow_tool` to understand execution paths.\n\n"
             "### Tips\n\n"
             "- Start broad (stats, architecture) then narrow down to specific areas.\n"
             "- Use `children_of` on a file to see all its functions and classes.\n"
-            "- Use `find_large_functions` to identify complex code.\n\n"
+            "- Use `find_large_functions_tool` to identify complex code.\n\n"
             "## Token Efficiency Rules\n"
-            '- ALWAYS start with `get_minimal_context(task="<your task>")` '
+            '- ALWAYS start with `get_minimal_context_tool(task="<your task>")` '
             "before any other graph tool.\n"
             '- Use `detail_level="minimal"` on all calls. Only escalate to '
             '"standard" when minimal is insufficient.\n'
@@ -429,11 +428,11 @@ _SKILLS: dict[str, dict[str, str]] = {
             "## Review Changes\n\n"
             "Perform a thorough, risk-aware code review using the knowledge graph.\n\n"
             "### Steps\n\n"
-            "1. Run `detect_changes` to get risk-scored change analysis.\n"
-            "2. Run `get_affected_flows` to find impacted execution paths.\n"
-            "3. For each high-risk function, run `query_graph` with "
+            "1. Run `detect_changes_tool` to get risk-scored change analysis.\n"
+            "2. Run `get_affected_flows_tool` to find impacted execution paths.\n"
+            "3. For each high-risk function, run `query_graph_tool` with "
             'pattern="tests_for" to check test coverage.\n'
-            "4. Run `get_impact_radius` to understand the blast radius.\n"
+            "4. Run `get_impact_radius_tool` to understand the blast radius.\n"
             "5. For any untested changes, suggest specific test cases.\n\n"
             "### Output Format\n\n"
             "Provide findings grouped by risk level (high/medium/low) with:\n"
@@ -442,7 +441,7 @@ _SKILLS: dict[str, dict[str, str]] = {
             "- Suggested improvements\n"
             "- Overall merge recommendation\n\n"
             "## Token Efficiency Rules\n"
-            '- ALWAYS start with `get_minimal_context(task="<your task>")` '
+            '- ALWAYS start with `get_minimal_context_tool(task="<your task>")` '
             "before any other graph tool.\n"
             '- Use `detail_level="minimal"` on all calls. Only escalate to '
             '"standard" when minimal is insufficient.\n'
@@ -457,18 +456,18 @@ _SKILLS: dict[str, dict[str, str]] = {
             "## Debug Issue\n\n"
             "Use the knowledge graph to systematically trace and debug issues.\n\n"
             "### Steps\n\n"
-            "1. Use `semantic_search_nodes` to find code related to the issue.\n"
-            "2. Use `query_graph` with `callers_of` and `callees_of` to trace "
+            "1. Use `semantic_search_nodes_tool` to find code related to the issue.\n"
+            "2. Use `query_graph_tool` with `callers_of` and `callees_of` to trace "
             "call chains.\n"
-            "3. Use `get_flow` to see full execution paths through suspected areas.\n"
-            "4. Run `detect_changes` to check if recent changes caused the issue.\n"
-            "5. Use `get_impact_radius` on suspected files to see what else is affected.\n\n"
+            "3. Use `get_flow_tool` to see full execution paths through suspected areas.\n"
+            "4. Run `detect_changes_tool` to check if recent changes caused the issue.\n"
+            "5. Use `get_impact_radius_tool` on suspected files to see what else is affected.\n\n"
             "### Tips\n\n"
             "- Check both callers and callees to understand the full context.\n"
             "- Look at affected flows to find the entry point that triggers the bug.\n"
             "- Recent changes are the most common source of new issues.\n\n"
             "## Token Efficiency Rules\n"
-            '- ALWAYS start with `get_minimal_context(task="<your task>")` '
+            '- ALWAYS start with `get_minimal_context_tool(task="<your task>")` '
             "before any other graph tool.\n"
             '- Use `detail_level="minimal"` on all calls. Only escalate to '
             '"standard" when minimal is insufficient.\n'
@@ -489,14 +488,14 @@ _SKILLS: dict[str, dict[str, str]] = {
             '3. For renames, use `refactor_tool` with mode="rename" to preview all '
             "affected locations.\n"
             "4. Use `apply_refactor_tool` with the refactor_id to apply renames.\n"
-            "5. After changes, run `detect_changes` to verify the refactoring impact.\n\n"
+            "5. After changes, run `detect_changes_tool` to verify the refactoring impact.\n\n"
             "### Safety Checks\n\n"
             "- Always preview before applying (rename mode gives you an edit list).\n"
-            "- Check `get_impact_radius` before major refactors.\n"
-            "- Use `get_affected_flows` to ensure no critical paths are broken.\n"
-            "- Run `find_large_functions` to identify decomposition targets.\n\n"
+            "- Check `get_impact_radius_tool` before major refactors.\n"
+            "- Use `get_affected_flows_tool` to ensure no critical paths are broken.\n"
+            "- Run `find_large_functions_tool` to identify decomposition targets.\n\n"
             "## Token Efficiency Rules\n"
-            '- ALWAYS start with `get_minimal_context(task="<your task>")` '
+            '- ALWAYS start with `get_minimal_context_tool(task="<your task>")` '
             "before any other graph tool.\n"
             '- Use `detail_level="minimal"` on all calls. Only escalate to '
             '"standard" when minimal is insufficient.\n'
@@ -548,7 +547,7 @@ def generate_hooks_config(repo_root: Path) -> dict[str, Any]:
 
     Hooks use the v1.x+ schema: each entry needs a ``matcher`` and a nested
     ``hooks`` array. Timeouts are in seconds. ``PreCommit`` is not a valid
-    Claude Code event — pre-commit checks are handled by ``install_git_hook``.
+    Claude Code event; pre-commit checks are handled by ``install_git_hook``.
     """
     repo_arg = json.dumps(repo_root.resolve().as_posix())
     return {
@@ -637,7 +636,7 @@ def install_git_hook(repo_root: Path) -> Path | None:
 
     Called automatically by ``code-review-graph install``
     Creates ``.git/hooks/pre-commit`` if it doesn't exist, or appends to an
-    existing one — preserving any hooks already there. Returns None when no
+    existing one while preserving any hooks already there. Returns None when no
     ``.git`` directory is found.
     """
     script = """\
@@ -652,7 +651,7 @@ fi
 
     git_dir = repo_root / ".git"
     if not git_dir.is_dir():
-        logger.warning("No .git directory found at %s — skipping git hook install.", repo_root)
+        logger.warning("No .git directory found at %s; skipping git hook install.", repo_root)
         return None
 
     hook_path = git_dir / "hooks" / "pre-commit"
@@ -791,11 +790,11 @@ scanning cannot.
 
 ### When to use graph tools FIRST
 
-- **Exploring code**: `semantic_search_nodes` or `query_graph` instead of Grep
-- **Understanding impact**: `get_impact_radius` instead of manually tracing imports
-- **Code review**: `detect_changes` + `get_review_context` instead of reading entire files
-- **Finding relationships**: `query_graph` with callers_of/callees_of/imports_of/tests_for
-- **Architecture questions**: `get_architecture_overview` + `list_communities`
+- **Exploring code**: `semantic_search_nodes_tool` or `query_graph_tool` before broad search
+- **Understanding impact**: `get_impact_radius_tool` instead of manually tracing imports
+- **Code review**: `detect_changes_tool` + `get_review_context_tool` instead of reading entire files
+- **Finding relationships**: `query_graph_tool` with callers_of/callees_of/imports_of/tests_for
+- **Architecture questions**: `get_architecture_overview_tool` + `list_communities_tool`
 
 Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 
@@ -803,21 +802,21 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 
 | Tool | Use when |
 | ------ | ---------- |
-| `detect_changes` | Reviewing code changes — gives risk-scored analysis |
-| `get_review_context` | Need source snippets for review — token-efficient |
-| `get_impact_radius` | Understanding blast radius of a change |
-| `get_affected_flows` | Finding which execution paths are impacted |
-| `query_graph` | Tracing callers, callees, imports, tests, dependencies |
-| `semantic_search_nodes` | Finding functions/classes by name or keyword |
-| `get_architecture_overview` | Understanding high-level codebase structure |
+| `detect_changes_tool` | Reviewing code changes; gives risk-scored analysis |
+| `get_review_context_tool` | Need source snippets for review; token-efficient |
+| `get_impact_radius_tool` | Understanding blast radius of a change |
+| `get_affected_flows_tool` | Finding which execution paths are impacted |
+| `query_graph_tool` | Tracing callers, callees, imports, tests, dependencies |
+| `semantic_search_nodes_tool` | Finding functions/classes by name or keyword |
+| `get_architecture_overview_tool` | Understanding high-level codebase structure |
 | `refactor_tool` | Planning renames, finding dead code |
 
 ### Workflow
 
 1. The graph auto-updates on file changes (via hooks).
-2. Use `detect_changes` for code review.
-3. Use `get_affected_flows` to understand impact.
-4. Use `query_graph` pattern=\"tests_for\" to check coverage.
+2. Use `detect_changes_tool` for code review.
+3. Use `get_affected_flows_tool` to understand impact.
+4. Use `query_graph_tool` pattern=\"tests_for\" to check coverage.
 """
 
 # Copilot-specific instruction file content: uses VS Code tool references and
@@ -840,11 +839,11 @@ test coverage) that file scanning cannot.
 
 ### When to use graph tools FIRST
 
-- **Exploring code**: `semantic_search_nodes` or `query_graph`
-- **Understanding impact**: `get_impact_radius`
-- **Code review**: `detect_changes` + `get_review_context`
-- **Finding relationships**: `query_graph` callers_of/callees_of
-- **Architecture questions**: `get_architecture_overview`
+- **Exploring code**: `semantic_search_nodes_tool` or `query_graph_tool`
+- **Understanding impact**: `get_impact_radius_tool`
+- **Code review**: `detect_changes_tool` + `get_review_context_tool`
+- **Finding relationships**: `query_graph_tool` callers_of/callees_of
+- **Architecture questions**: `get_architecture_overview_tool`
 
 Fall back to file/search tools **only** when the graph doesn't
 cover what you need.
@@ -853,21 +852,21 @@ cover what you need.
 
 | Tool | Use when |
 | ------ | ---------- |
-| `detect_changes` | Risk-scored change analysis |
-| `get_review_context` | Token-efficient source snippets |
-| `get_impact_radius` | Blast radius of a change |
-| `get_affected_flows` | Impacted execution paths |
-| `query_graph` | Trace callers, callees, imports, tests |
-| `semantic_search_nodes` | Find functions/classes by keyword |
-| `get_architecture_overview` | High-level structure |
+| `detect_changes_tool` | Risk-scored change analysis |
+| `get_review_context_tool` | Token-efficient source snippets |
+| `get_impact_radius_tool` | Blast radius of a change |
+| `get_affected_flows_tool` | Impacted execution paths |
+| `query_graph_tool` | Trace callers, callees, imports, tests |
+| `semantic_search_nodes_tool` | Find functions/classes by keyword |
+| `get_architecture_overview_tool` | High-level structure |
 | `refactor_tool` | Rename planning, dead code |
 
 ### Workflow
 
 1. The graph auto-updates on file changes (via hooks).
-2. Use `detect_changes` for code review.
-3. Use `get_affected_flows` to understand impact.
-4. Use `query_graph` pattern=\"tests_for\" to check coverage.
+2. Use `detect_changes_tool` for code review.
+3. Use `get_affected_flows_tool` to understand impact.
+4. Use `query_graph_tool` pattern=\"tests_for\" to check coverage.
 """
 
 # Maps instruction file path → (marker, section) for files that need content
@@ -1087,7 +1086,7 @@ def inject_platform_instructions(repo_root: Path, target: str = "all") -> list[s
     Writes AGENTS.md, GEMINI.md, .cursorrules, and/or .windsurfrules
     depending on ``target``:
 
-    - ``"all"`` (default): writes every file — matches pre-filter behavior.
+    - ``"all"`` (default): writes every file and matches pre-filter behaviour.
     - ``"claude"``: writes nothing (CLAUDE.md is handled by ``inject_claude_md``).
     - any other platform key (``cursor``, ``windsurf``, ``antigravity``,
       ``opencode``): writes only the files associated with that platform.
@@ -1165,7 +1164,7 @@ def _cursor_hook_scripts() -> dict[str, str]:
     update_script = """\
 #!/usr/bin/env bash
 # code-review-graph: auto-update graph after file edits (Cursor hook)
-# Fails gracefully — never blocks the editor.
+# Fails gracefully; never blocks the editor.
 set -euo pipefail
 
 # Consume stdin (Cursor sends JSON context)
@@ -1186,7 +1185,7 @@ exit 0
     session_start_script = """\
 #!/usr/bin/env bash
 # code-review-graph: show graph status on session start (Cursor hook)
-# Fails gracefully — never blocks the editor.
+# Fails gracefully; never blocks the editor.
 set -euo pipefail
 
 # Consume stdin
@@ -1208,7 +1207,7 @@ exit 0
     pre_commit_script = """\
 #!/usr/bin/env bash
 # code-review-graph: detect changes before git commit (Cursor hook)
-# Fails gracefully — never blocks the editor.
+# Fails gracefully; never blocks the editor.
 set -euo pipefail
 
 # Consume stdin
@@ -1346,12 +1345,12 @@ def install_qoder_skills(repo_root: Path) -> Path | None:
 def _opencode_plugin_content() -> str:
     """Return TypeScript source for the OpenCode user-level plugin.
 
-    The plugin hooks into three OpenCode events to mirror the Claude Code
-    hook behaviors:
+    The plugin hooks into three OpenCode events to mirror the standard
+    code-review-graph hook behaviour:
 
-    1. ``file.edited`` — runs ``code-review-graph update --skip-flows``
-    2. ``session.created`` — runs ``code-review-graph status``
-    3. ``tool.execute.before`` — when the tool is a shell command starting
+    1. ``file.edited``: runs ``code-review-graph update --skip-flows``
+    2. ``session.created``: runs ``code-review-graph status``
+    3. ``tool.execute.before``: when the tool is a shell command starting
        with ``git commit``, runs ``code-review-graph detect-changes --brief``
 
     All handlers use try/catch so errors never break the editor session.
@@ -1386,7 +1385,7 @@ export default (app: any) => {
     try {
       await $`code-review-graph update --skip-flows`.quiet()
     } catch {
-      // Swallow — graph may not be built yet for this project.
+      // Swallow; graph may not be built yet for this project.
     }
   })
 
@@ -1399,7 +1398,7 @@ export default (app: any) => {
         console.log("[code-review-graph]", output)
       }
     } catch {
-      // Swallow — not every project has a graph.
+      // Swallow; not every project has a graph.
     }
   })
 
@@ -1418,7 +1417,7 @@ export default (app: any) => {
         }
       }
     } catch {
-      // Swallow — never block a commit.
+      // Swallow; never block a commit.
     }
   })
 }

@@ -2,116 +2,55 @@
 
 ## System Overview
 
-`code-review-graph` is a Claude Code plugin that maintains a persistent, incrementally-updated knowledge graph of a codebase. It's designed to make code reviews faster and more context-aware by providing structural understanding of code relationships.
+`code-review-graph` is a local MCP server and CLI that maintains an incremental knowledge graph for a repository. It supports multiple AI coding tools, including Codex, Claude Code, Cursor, Windsurf, Zed, Continue, OpenCode, Antigravity, Gemini CLI, Qwen Code, Kiro, Qoder, GitHub Copilot, and GitHub Copilot CLI.
 
-## Component Diagram
+The system parses source files, stores structural relationships in SQLite, and exposes 30 MCP tools plus 5 MCP prompts for code review, search, architecture analysis, refactoring, wiki generation, and multi-repo search.
 
+## Components
+
+```text
+AI coding tool
+  ├─ MCP config, platform instructions, hooks, or skills
+  └─ code-review-graph MCP server
+       ├─ stdio transport
+       ├─ streamable HTTP transport on localhost
+       ├─ parser and incremental engine
+       ├─ SQLite graph store
+       ├─ post-processing: signatures, FTS, flows, communities, summaries
+       ├─ optional embeddings store
+       └─ tools for review, query, analysis, refactoring, wiki, and multi-repo search
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                        Claude Code                           │
-│                                                              │
-│  Skills (SKILL.md)          Hooks (hooks.json)               │
-│  ├── build-graph            └── PostToolUse (Write|Edit|Bash) │
-│  ├── review-delta                → incremental update         │
-│  └── review-pr                                               │
-│          │                        │                          │
-│          ▼                        ▼                          │
-│  ┌────────────────────────────────────────────┐              │
-│  │            MCP Server (stdio)              │              │
-│  │                                            │              │
-│  │  22 MCP Tools + 5 MCP Prompts              │              │
-│  │  ├── Core: build, impact, query, review,   │              │
-│  │  │   search, embed, stats, docs, large_fn  │              │
-│  │  ├── Flows: list, get, affected            │              │
-│  │  ├── Communities: list, get, architecture   │              │
-│  │  ├── Analysis: detect_changes, refactor,   │              │
-│  │  │   apply_refactor                        │              │
-│  │  ├── Wiki: generate, get_page              │              │
-│  │  └── Multi-repo: list_repos, cross_search  │              │
-│  └────────────────┬───────────────────────────┘              │
-└───────────────────┼──────────────────────────────────────────┘
-                    │
-        ┌───────────┼───────────────┐
-        ▼           ▼               ▼
-   ┌─────────┐ ┌─────────┐  ┌─────────────┐
-   │ Parser  │ │  Graph  │  │ Incremental │
-   │         │ │  Store  │  │   Engine    │
-   └────┬────┘ └────┬────┘  └──────┬──────┘
-        │           │              │
-        ▼           ▼              ▼
-   Tree-sitter   SQLite DB      git diff
-   grammars      (.code-review- subprocess
-                 graph/
-                 graph.db)
-```
+
+Platform installation is handled by `code_review_graph/skills.py`. It writes MCP configuration and, where supported, installs native hooks, generated skills, Copilot instruction files, Gemini CLI settings, Qoder skills, Cursor hooks, Codex hooks, OpenCode plugin support, and a git pre-commit hook.
 
 ## Data Flow
 
-### Full Build
-1. `collect_all_files()` gathers tracked files (`git ls-files`) and applies `.code-review-graphignore` (gitignored files are skipped automatically when git is available)
-2. For each file, `CodeParser.parse_file()` uses Tree-sitter to extract AST
-3. AST walker identifies structural nodes (classes, functions, imports) and edges (calls, inheritance)
-4. `GraphStore.store_file_nodes_edges()` persists to SQLite with file hash for change detection
-5. Metadata updated with timestamp
+Full builds call `collect_all_files()`, prefer tracked files from git or SVN where available, apply default ignore patterns and `.code-review-graphignore`, then parse each source file with `CodeParser`. Parsed nodes and edges are written through `GraphStore.store_file_nodes_edges()`.
 
-### Incremental Update
-1. `get_changed_files()` runs `git diff --name-only` against base ref
-2. `find_dependents()` queries the graph for files importing the changed files
-3. Changed + dependent files are re-parsed (others skipped via hash comparison)
-4. Only affected rows in SQLite are updated
+Incremental updates detect changed files through git or SVN, find dependent files through stored import edges, skip unchanged files by SHA-256 hash, and re-run language-specific resolvers where needed. Post-processing refreshes signatures, FTS, execution flows, communities, and summary tables according to the selected `postprocess` mode.
 
-### Review Context Generation
-1. Changed files identified (git diff or explicit list)
-2. `get_impact_radius()` performs BFS from changed nodes through the graph
-3. Source snippets extracted for changed areas only
-4. Review guidance generated (test coverage gaps, wide blast radius warnings)
-5. Assembled into a structured, token-efficient context for Claude
+Review tools start from changed files, compute impact radius, affected flows, community context, test coverage signals, and risk scores, then return compact context for the AI client.
 
 ## Storage
 
-### SQLite Schema
-- **nodes** table: id, kind, name, qualified_name, file_path, line_start/end, language, community_id, etc.
-- **edges** table: id, kind, source_qualified, target_qualified, file_path, line
-- **metadata** table: key-value pairs (last_updated, build_type, schema_version)
-- **flows** table: id, name, entry_point_id, depth, node_count, file_count, criticality, path_json
-- **flow_memberships** table: flow_id, node_id, position
-- **communities** table: id, name, level, parent_id, cohesion, size, dominant_language, description
-- **nodes_fts** (FTS5 virtual table): full-text search on name, qualified_name, file_path, signature
-- **embeddings** table (separate DB): node_id, model, vector, hash
+The primary graph database is SQLite in `.code-review-graph/graph.db`, or in `CRG_DATA_DIR` when configured. WAL mode is enabled for concurrent reads.
 
-Indexes on qualified_name, file_path, edge source/target, criticality, community_id, and cohesion for fast lookups.
+Core tables include `nodes`, `edges`, and `metadata`. Migrations add `flows`, `flow_memberships`, `communities`, `nodes_fts`, `community_summaries`, `flow_snapshots`, and `risk_index`. Edge rows include `confidence` and `confidence_tier`.
 
-WAL mode enabled for concurrent read access during updates.
-
-### Qualified Names
-Nodes are uniquely identified by qualified names:
-- Files: absolute path (e.g., `/repo/src/auth.py`)
-- Functions: `file_path::function_name` (e.g., `/repo/src/auth.py::authenticate`)
-- Methods: `file_path::ClassName.method_name` (e.g., `/repo/src/auth.py::AuthService.login`)
+The embeddings store is separate and records vectors by qualified name, text hash, and provider identity. Provider identity includes the backend for OpenAI-compatible endpoints so vectors from different backends are not mixed.
 
 ## Parsing Strategy
 
-Tree-sitter provides language-agnostic AST access. The parser:
-1. Walks the AST recursively
-2. Pattern-matches on node types (language-specific mappings in `_CLASS_TYPES`, `_FUNCTION_TYPES`, etc.)
-3. Extracts names, parameters, return types, base classes
-4. Identifies calls within function bodies
-5. Resolves imports to module paths
+Tree-sitter handles most language grammars. The parser maps extensions and shebang interpreters to 35 language labels, then extracts files, classes, functions, types, tests, imports, calls, inheritance, containment, references, framework injection, Temporal stubs, and Kafka consumer or producer topics.
 
-This approach is more robust than tree-sitter queries across grammar versions.
+Specialised resolver passes improve cross-file or framework-heavy code. Current resolvers include ReScript cross-module resolution, Spring dependency-injection call resolution, Temporal workflow/activity resolution, TypeScript path aliases, and Jedi-based Python call resolution when enrichment dependencies are installed.
 
-## Visualization
+## Transports And Automation
 
-The `visualization.py` module generates an interactive D3.js force-directed graph as a self-contained HTML file. It reads all nodes and edges from the SQLite graph store and renders them in the browser, allowing developers to visually explore code relationships, filter by node kind, and inspect dependencies.
+`code-review-graph serve` runs MCP over stdio. `code-review-graph serve --http` runs streamable HTTP on localhost, defaulting to `127.0.0.1:5555`.
 
-## Impact Analysis Algorithm
+Automation is available through platform hooks, `code-review-graph watch`, the git pre-commit hook, and `crg-daemon` for multi-repo watcher supervision.
 
-BFS from seed nodes (changed files' contents):
-1. Seed = all qualified names in changed files
-2. For each node in frontier:
-   - Follow forward edges (what this node affects)
-   - Follow reverse edges (what depends on this node)
-3. Expand up to `max_depth` hops (default: 2)
-4. Collect all reached nodes as "impacted"
+## Visualisation And Exports
 
-This captures both downstream effects (things that call changed code) and upstream context (things that the changed code depends on).
+`visualization.py` generates a self-contained D3.js HTML visualisation. The CLI can also export GraphML, Neo4j Cypher, Obsidian vault files, and SVG.

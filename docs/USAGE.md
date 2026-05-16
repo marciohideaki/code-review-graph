@@ -1,145 +1,144 @@
-# Code Review Graph — User Guide
+# Code Review Graph User Guide
 
-**Version:** v2.1.0 (Apr 3, 2026)
+Version: 2.3.3
 
 ## Installation
 
 ```bash
 pip install code-review-graph
-code-review-graph install    # auto-detects and configures all supported platforms
-code-review-graph build      # parse your codebase
+code-review-graph install
+code-review-graph build
 ```
 
-`install` detects which AI coding tools you have, writes the correct MCP configuration for each one, and installs platform-native hooks where supported. Restart your editor/tool after installing.
+`install` detects supported AI coding tools, writes MCP configuration, installs native hooks or skills where the platform supports them, and adds graph-aware instructions to platform rule files. Restart your editor or coding tool after installing.
 
-To target a specific platform instead of auto-detecting all:
+To target one platform:
 
 ```bash
 code-review-graph install --platform codex
-code-review-graph install --platform cursor
 code-review-graph install --platform claude-code
+code-review-graph install --platform cursor
+code-review-graph install --platform windsurf
+code-review-graph install --platform zed
+code-review-graph install --platform continue
+code-review-graph install --platform opencode
+code-review-graph install --platform antigravity
+code-review-graph install --platform gemini-cli
+code-review-graph install --platform qwen
+code-review-graph install --platform kiro
+code-review-graph install --platform qoder
+code-review-graph install --platform copilot
+code-review-graph install --platform copilot-cli
 ```
 
-### Supported Platforms
+## Supported Platforms
 
-| Platform | Config file |
-|----------|-------------|
-| **Codex** | `~/.codex/config.toml` + `~/.codex/hooks.json` |
-| **Claude Code** | `.mcp.json` + `.claude/settings.json` |
-| **Cursor** | `.cursor/mcp.json` |
-| **Windsurf** | `.windsurf/mcp.json` |
-| **Zed** | `.zed/settings.json` |
-| **Continue** | `.continue/config.json` |
-| **OpenCode** | `.opencode.json` |
-| **Antigravity** | `~/.gemini/antigravity/mcp_config.json` |
-| **Gemini CLI** | `.gemini/settings.json` |
-| **Qwen Code** | `~/.qwen/settings.json` |
-| **Qoder** | `.qoder/mcp.json` |
+| Platform | Target | Config file |
+|----------|--------|-------------|
+| Codex | `codex` | `~/.codex/config.toml` |
+| Claude Code | `claude-code` or `claude` | `.mcp.json` |
+| Cursor | `cursor` | `.cursor/mcp.json` |
+| Windsurf | `windsurf` | `~/.codeium/windsurf/mcp_config.json` |
+| Zed | `zed` | platform Zed `settings.json` |
+| Continue | `continue` | `~/.continue/config.json` |
+| OpenCode | `opencode` | `.opencode.json` |
+| Antigravity | `antigravity` | `~/.gemini/antigravity/mcp_config.json` |
+| Gemini CLI | `gemini-cli` | `.gemini/settings.json` |
+| Qwen Code | `qwen` | `~/.qwen/settings.json` |
+| Kiro | `kiro` | `.kiro/settings/mcp.json` |
+| Qoder | `qoder` | `.qoder/mcp.json` |
+| GitHub Copilot | `copilot` | `.vscode/mcp.json` |
+| GitHub Copilot CLI | `copilot-cli` | `~/.copilot/mcp-config.json` |
+
+Some platforms also receive native automation: Codex hooks, Claude Code hooks and generated skills, Gemini CLI hooks and skills, Cursor hooks, Qoder skills and hooks, OpenCode plugin support, and a git pre-commit hook where a git repository is available.
 
 ## Core Workflow
 
-### 1. Build the graph (first time only)
-```
-/code-review-graph:build-graph
-```
-Parses your entire codebase. Takes ~10s for 500 files.
+Build the graph once:
 
-### 2. Review changes (daily use)
-```
-/code-review-graph:review-delta
-```
-Reviews only files changed since last commit + everything impacted. 5-10x fewer tokens than a full review.
-
-### 3. Review a PR
-```
-/code-review-graph:review-pr
-```
-Comprehensive structural review of a branch diff with blast-radius analysis.
-
-### 4. Watch mode (optional)
 ```bash
-code-review-graph watch
+code-review-graph build
 ```
-Auto-updates the graph on every file save. Zero manual work.
 
-### 5. Visualize the graph (optional)
+After that, run incremental updates manually with `code-review-graph update`, keep a foreground watcher running with `code-review-graph watch`, or use installed platform hooks. The multi-repo daemon can supervise watchers for several repositories:
+
 ```bash
-code-review-graph visualize
-open .code-review-graph/graph.html
+crg-daemon add ~/project-a --alias project-a
+crg-daemon start
+crg-daemon status
 ```
-Interactive D3.js force-directed graph. Starts collapsed (File nodes only) — click a file to expand its children. Use the search bar to filter, and click legend edge types to toggle visibility.
 
-### 6. Semantic search (optional)
+For MCP clients, run the server over stdio by default or streamable HTTP on localhost:
+
 ```bash
-pip install "code-review-graph[embeddings]"
+code-review-graph serve
+code-review-graph serve --http
 ```
-Then use `embed_graph_tool` to compute vectors. `semantic_search_nodes_tool` automatically uses vector similarity.
 
-Embedding providers: Local (sentence-transformers), Google Gemini, MiniMax. Configure via `CRG_EMBEDDING_MODEL` env var.
+`serve --tools` and `CRG_TOOLS` can restrict the 30 exposed MCP tools to a comma-separated allow-list.
 
-### 7. Detect changes with risk scoring (v2)
-```
-Ask Claude: "Review my recent changes with risk scoring"
-```
-Uses `detect_changes_tool` to map diffs to affected functions, flows, communities, and test gaps.
+## Common Tasks
 
-### 8. Explore architecture (v2)
-```
-Ask Claude: "Show me the architecture of this project"
-```
-Uses `get_architecture_overview_tool` for community-based architecture map with coupling warnings.
+Use `detect_changes_tool` for risk-scored review of recent changes. It maps diffs to affected functions, flows, communities, and test gaps.
 
-### 9. Generate wiki (v2)
-```bash
-code-review-graph wiki
-```
-Creates markdown wiki pages for each detected community in `.code-review-graph/wiki/`.
+Use `get_architecture_overview_tool` for a community-based architecture map with coupling warnings.
 
-### 10. Multi-repo search (v2)
+Use `semantic_search_nodes_tool` for keyword or vector-backed search. Run `embed_graph_tool` first if you want vector similarity.
+
+Use `cross_repo_search_tool` after registering other repositories:
+
 ```bash
 code-review-graph register /path/to/other/repo --alias mylib
 ```
-Then use `cross_repo_search_tool` to search across all registered repositories.
 
-## Token Savings
+Generate a markdown wiki from detected communities:
 
-| Scenario | Without graph | With graph |
-|----------|:---:|:---:|
-| Review 200-file project | ~150k tokens | ~25k tokens |
-| Incremental review | ~150k tokens | ~8k tokens |
-| PR review | ~100k tokens | ~15k tokens |
+```bash
+code-review-graph wiki
+```
+
+Generate an interactive visualisation or export the graph:
+
+```bash
+code-review-graph visualize
+code-review-graph visualize --format graphml
+code-review-graph visualize --format cypher
+code-review-graph visualize --format obsidian
+code-review-graph visualize --format svg
+```
 
 ## Supported Languages
 
-Python, TypeScript/TSX, JavaScript, Vue, Go, Rust, Java, Scala, C#, Ruby, Kotlin, Swift, PHP, Solidity, C/C++, Dart, R, Perl
+The parser supports 35 language labels across 56 extensions: Bash, C, C++, C#, Dart, Elixir, GDScript, Go, Java, JavaScript, Julia, Kotlin, Lua, Luau, Nix, notebooks, Objective-C, Perl, PHP, PowerShell, Python, R, ReScript, Ruby, Rust, Scala, Solidity, SQL, Svelte, Swift, TSX, TypeScript, Verilog/SystemVerilog, Vue, and Zig.
+
+Notebook support covers Jupyter and Databricks `.ipynb` files, including Python, R, SQL, and Scala cells. Extension-less scripts are detected through common shebang interpreters.
 
 ## What Gets Indexed
 
-- **Nodes**: Files, Classes, Functions/Methods, Types, Tests
-- **Edges**: CALLS, IMPORTS_FROM, INHERITS, IMPLEMENTS, CONTAINS, TESTED_BY, DEPENDS_ON
+Nodes represent files, classes, functions, types, and tests.
 
-See [schema.md](schema.md) for full details.
+Edges represent `CALLS`, `IMPORTS_FROM`, `INHERITS`, `IMPLEMENTS`, `CONTAINS`, `TESTED_BY`, `DEPENDS_ON`, `REFERENCES`, `INJECTS`, `TEMPORAL_STUB`, `CONSUMES`, and `PRODUCES`.
+
+See [schema.md](schema.md) for table details.
+
+## Embeddings And Network Use
+
+Local embeddings use `sentence-transformers`:
+
+```bash
+pip install "code-review-graph[embeddings]"
+```
+
+Cloud providers are opt-in. Google Gemini requires `GOOGLE_API_KEY`; MiniMax requires `MINIMAX_API_KEY`; OpenAI-compatible providers require `CRG_OPENAI_BASE_URL`, `CRG_OPENAI_API_KEY`, and `CRG_OPENAI_MODEL`. Cloud providers send function names, docstrings, and file paths to the selected external API, and print a stderr warning unless `CRG_ACCEPT_CLOUD_EMBEDDINGS=1` is set. Localhost OpenAI-compatible endpoints do not trigger the cloud warning.
 
 ## Ignore Patterns
 
-By default, these paths are excluded from indexing:
+By default, generated files, dependency directories, caches, build output, lockfiles, database files, and VCS metadata are excluded. In git repositories, indexing is based on tracked files from `git ls-files`, so gitignored files are skipped automatically.
 
-```
-.code-review-graph/**    node_modules/**    .git/**
-__pycache__/**           *.pyc              .venv/**
-venv/**                  dist/**            build/**
-.next/**                 target/**          *.min.js
-*.min.css                *.map              *.lock
-package-lock.json        yarn.lock          *.db
-*.sqlite                 *.db-journal
-```
+To exclude additional tracked files, add `.code-review-graphignore` at the repository root:
 
-To add custom patterns, create a `.code-review-graphignore` file in your repo root (same syntax as `.gitignore`):
-
-```
+```gitignore
 generated/**
 vendor/**
 *.generated.ts
 ```
-
-In git repos, indexing is based on tracked files (`git ls-files`), so gitignored files are skipped automatically. Use `.code-review-graphignore` to exclude tracked files or when git isn't available.

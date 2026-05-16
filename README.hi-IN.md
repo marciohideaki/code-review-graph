@@ -45,7 +45,7 @@ code-review-graph build            # अपना कोडबेस पार�
 एक कमांड सब कुछ सेट कर देता है। `install` पहचान लेता है कि आपके पास कौन से AI कोडिंग टूल हैं, प्रत्येक के लिए सही MCP कॉन्फ़िगरेशन लिखता है, और आपके प्लेटफ़ॉर्म रूल्स में ग्राफ-अवेयर निर्देश जोड़ता है। यह स्वचालित रूप से पहचानता है कि आपने `uvx` या `pip`/`pipx` से इंस्टॉल किया है और उसके अनुसार कॉन्फ़िग बनाता है। इंस्टॉल के बाद अपना एडिटर/टूल रीस्टार्ट करें।
 
 <p align="center">
-  <img src="diagrams/diagram8_supported_platforms.png" alt="एक इंस्टॉल, हर प्लेटफ़ॉर्म: Codex, Claude Code, Cursor, Windsurf, Zed, Continue, OpenCode, Antigravity, और Kiro को स्वचालित रूप से पहचानता है" width="85%" />
+  <img src="diagrams/diagram8_supported_platforms.png" alt="एक इंस्टॉल, हर प्लेटफ़ॉर्म: Codex, Claude Code, Cursor, Windsurf, Zed, Continue, OpenCode, Antigravity, Gemini CLI, Qwen Code, Kiro, Qoder, GitHub Copilot, और GitHub Copilot CLI को स्वचालित रूप से पहचानता है" width="85%" />
 </p>
 
 किसी विशेष प्लेटफ़ॉर्म को टार्गेट करने के लिए:
@@ -54,7 +54,17 @@ code-review-graph build            # अपना कोडबेस पार�
 code-review-graph install --platform codex       # केवल Codex कॉन्फ़िगर करें
 code-review-graph install --platform cursor      # केवल Cursor कॉन्फ़िगर करें
 code-review-graph install --platform claude-code  # केवल Claude Code कॉन्फ़िगर करें
+code-review-graph install --platform windsurf     # केवल Windsurf कॉन्फ़िगर करें
+code-review-graph install --platform zed          # केवल Zed कॉन्फ़िगर करें
+code-review-graph install --platform continue     # केवल Continue कॉन्फ़िगर करें
+code-review-graph install --platform opencode     # केवल OpenCode कॉन्फ़िगर करें
+code-review-graph install --platform antigravity  # केवल Antigravity कॉन्फ़िगर करें
+code-review-graph install --platform gemini-cli   # केवल Gemini CLI कॉन्फ़िगर करें
+code-review-graph install --platform qwen         # केवल Qwen Code कॉन्फ़िगर करें
 code-review-graph install --platform kiro         # केवल Kiro कॉन्फ़िगर करें
+code-review-graph install --platform qoder        # केवल Qoder कॉन्फ़िगर करें
+code-review-graph install --platform copilot      # केवल GitHub Copilot कॉन्फ़िगर करें
+code-review-graph install --platform copilot-cli  # केवल GitHub Copilot CLI कॉन्फ़िगर करें
 ```
 
 Python 3.10+ आवश्यक है। सबसे अच्छे अनुभव के लिए [uv](https://docs.astral.sh/uv/) इंस्टॉल करें (MCP कॉन्फ़िग उपलब्ध होने पर `uvx` का उपयोग करेगा, अन्यथा सीधे `code-review-graph` कमांड पर फ़ॉलबैक करेगा)।
@@ -105,13 +115,13 @@ Build the code review graph for this project
   <img src="diagrams/diagram6_monorepo_funnel.png" alt="Next.js मोनोरिपो: 27,732 फ़ाइलें code-review-graph से होकर ~15 फ़ाइलों तक — 49 गुना कम टोकन" width="80%" />
 </p>
 
-### 23 भाषाएं + Jupyter नोटबुक
+### 56 एक्सटेंशन में 35 भाषा लेबल
 
 <p align="center">
-  <img src="diagrams/diagram9_language_coverage.png" alt="19 भाषाएं श्रेणी के अनुसार: वेब, बैकेंड, सिस्टम्स, मोबाइल, स्क्रिप्टिंग, और Jupyter/Databricks नोटबुक सपोर्ट" width="90%" />
+  <img src="diagrams/diagram9_language_coverage.png" alt="56 एक्सटेंशन में 35 भाषा लेबल, साथ में Jupyter/Databricks नोटबुक सपोर्ट" width="90%" />
 </p>
 
-हर भाषा में फ़ंक्शन, क्लासेज़, इम्पोर्ट्स, कॉल साइट्स, इनहेरिटेंस, और टेस्ट डिटेक्शन के लिए पूर्ण Tree-sitter ग्रामर सपोर्ट। इसमें Zig, PowerShell, Julia, और Svelte SFC सपोर्ट शामिल है। साथ ही मल्टी-लैंग्वेज सेल सपोर्ट (Python, R, SQL) के साथ Jupyter/Databricks नोटबुक पार्सिंग (`.ipynb`), और Perl XS फ़ाइलें (`.xs`)।
+फ़ंक्शन, क्लासेज़, इम्पोर्ट्स, कॉल साइट्स, इनहेरिटेंस, और टेस्ट डिटेक्शन के लिए Tree-sitter ग्रामर सपोर्ट। भाषा लेबल में Bash, C, C++, C#, Dart, Elixir, GDScript, Go, Java, JavaScript, Julia, Kotlin, Lua, Luau, Nix, Objective-C, Perl, PHP, PowerShell, Python, R, ReScript, Ruby, Rust, Scala, Solidity, SQL, Svelte, Swift, TSX, TypeScript, Verilog/SystemVerilog, Vue, और Zig शामिल हैं। साथ में मल्टी-लैंग्वेज सेल सपोर्ट (Python, R, SQL) के साथ Jupyter/Databricks नोटबुक पार्सिंग (`.ipynb`), और Perl XS फ़ाइलें (`.xs`)।
 
 ---
 
@@ -130,7 +140,7 @@ Build the code review graph for this project
 | विशेषता | विवरण |
 |---------|--------|
 | **इंक्रीमेंटल अपडेट** | केवल बदली हुई फ़ाइलों को री-पार्स करता है। बाद के अपडेट 2 सेकंड से कम में पूरे होते हैं। |
-| **23 भाषाएं + नोटबुक** | Python, TypeScript/TSX, JavaScript, Vue, Svelte, Go, Rust, Java, Scala, C#, Ruby, Kotlin, Swift, PHP, Solidity, C/C++, Dart, R, Perl, Lua, Zig, PowerShell, Julia, Jupyter/Databricks (.ipynb) |
+| **56 एक्सटेंशन में 35 भाषा लेबल** | Bash, C, C++, C#, Dart, Elixir, GDScript, Go, Java, JavaScript, Julia, Kotlin, Lua, Luau, Nix, Objective-C, Perl, PHP, PowerShell, Python, R, ReScript, Ruby, Rust, Scala, Solidity, SQL, Svelte, Swift, TSX, TypeScript, Verilog/SystemVerilog, Vue, Zig, Jupyter/Databricks (.ipynb) |
 | **ब्लास्ट-रेडियस विश्लेषण** | दिखाता है कि किसी भी बदलाव से कौन से फ़ंक्शन, क्लासेज़, और फ़ाइलें प्रभावित होती हैं |
 | **ऑटो-अपडेट हुक्स** | बिना मैन्युअल हस्तक्षेप के हर फ़ाइल एडिट और git कमिट पर ग्राफ अपडेट होता है |
 | **सिमेंटिक सर्च** | sentence-transformers, Google Gemini, MiniMax, या किसी भी OpenAI-compatible एंडपॉइंट (असली OpenAI, Azure, new-api, LiteLLM, vLLM, LocalAI) के ज़रिए वैकल्पिक वेक्टर एम्बेडिंग |
@@ -149,13 +159,13 @@ Build the code review graph for this project
 | **एक्ज़ीक्यूशन फ़्लोज़** | भारित क्रिटिकैलिटी के अनुसार क्रमबद्ध, एंट्री पॉइंट्स से कॉल चेन ट्रेस करें |
 | **कम्युनिटी डिटेक्शन** | बड़े ग्राफ़ के लिए रेज़ोल्यूशन स्केलिंग के साथ Leiden एल्गोरिदम से संबंधित कोड क्लस्टर करें |
 | **आर्किटेक्चर ओवरव्यू** | कपलिंग चेतावनियों के साथ स्वतः-जनित आर्किटेक्चर मैप |
-| **रिस्क-स्कोर्ड रिव्यूज़** | `detect_changes` डिफ़ को प्रभावित फ़ंक्शन, फ़्लोज़, और टेस्ट गैप्स से मैप करता है |
+| **रिस्क-स्कोर्ड रिव्यूज़** | `detect_changes_tool` डिफ़ को प्रभावित फ़ंक्शन, फ़्लोज़, और टेस्ट गैप्स से मैप करता है |
 | **रिफ़ैक्टरिंग टूल्स** | रीनेम प्रीव्यू, फ़्रेमवर्क-अवेयर डेड कोड डिटेक्शन, कम्युनिटी-ड्रिवन सुझाव |
 | **विकी जनरेशन** | कम्युनिटी संरचना से स्वतः मार्कडाउन विकी जनरेट करें |
 | **मल्टी-रिपो रजिस्ट्री** | कई रिपॉज़ रजिस्टर करें, सभी में सर्च करें |
 | **MCP प्रॉम्प्ट्स** | 5 वर्कफ़्लो टेम्प्लेट: review, architecture, debug, onboard, pre-merge |
 | **फ़ुल-टेक्स्ट सर्च** | कीवर्ड और वेक्टर सिमिलैरिटी को मिलाकर FTS5-संचालित हाइब्रिड सर्च |
-| **लोकल स्टोरेज** | `.code-review-graph/` में SQLite फ़ाइल। कोई बाहरी डेटाबेस नहीं, कोई क्लाउड निर्भरता नहीं। |
+| **लोकल स्टोरेज** | `.code-review-graph/` में SQLite फ़ाइल। बाहरी डेटाबेस की ज़रूरत नहीं। क्लाउड कॉल केवल तब होती हैं जब आप क्लाउड embedding provider चुनते हैं। |
 | **वॉच मोड** | काम करते समय लगातार ग्राफ अपडेट |
 
 ---
@@ -202,7 +212,7 @@ code-review-graph serve            # MCP सर्वर शुरू करे�
 </details>
 
 <details>
-<summary><strong>28 MCP टूल्स</strong></summary>
+<summary><strong>30 MCP टूल्स</strong></summary>
 <br>
 
 ग्राफ बनने के बाद आपका AI असिस्टेंट इन्हें स्वचालित रूप से उपयोग करता है।
@@ -210,6 +220,7 @@ code-review-graph serve            # MCP सर्वर शुरू करे�
 | टूल | विवरण |
 |-----|--------|
 | `build_or_update_graph_tool` | ग्राफ बनाएं या इंक्रीमेंटली अपडेट करें |
+| `run_postprocess_tool` | मौजूदा ग्राफ पर signatures, flows, communities, और full-text search index दोबारा चलाएं |
 | `get_minimal_context_tool` | अल्ट्रा-कॉम्पैक्ट कॉन्टेक्स्ट (~100 टोकन) — इसे पहले कॉल करें |
 | `get_impact_radius_tool` | बदली हुई फ़ाइलों का ब्लास्ट रेडियस |
 | `get_review_context_tool` | स्ट्रक्चरल सारांश के साथ टोकन-ऑप्टिमाइज़्ड रिव्यू कॉन्टेक्स्ट |
@@ -267,10 +278,11 @@ pip install code-review-graph[google-embeddings]   # Google Gemini एम्ब�
 pip install code-review-graph[communities]         # कम्युनिटी डिटेक्शन (igraph)
 pip install code-review-graph[eval]                # मूल्यांकन बेंचमार्क (matplotlib)
 pip install code-review-graph[wiki]                # LLM सारांश के साथ विकी जनरेशन (ollama)
+pip install code-review-graph[enrichment]          # कोड enrichment (tree-sitter-languages)
 pip install code-review-graph[all]                 # सभी वैकल्पिक डिपेंडेंसीज़
 ```
 
-OpenAI-compatible एम्बेडिंग्स (असली OpenAI, Azure, या सेल्फ-होस्टेड गेटवे जैसे new-api / LiteLLM / vLLM / LocalAI / Ollama openai मोड) के लिए कोई अतिरिक्त इंस्टॉल की ज़रूरत नहीं — बस एनवायरनमेंट वेरिएबल्स सेट करें और `embed_graph` को `provider="openai"` पास करें:
+OpenAI-compatible एम्बेडिंग्स (असली OpenAI, Azure, या सेल्फ-होस्टेड गेटवे जैसे new-api / LiteLLM / vLLM / LocalAI / Ollama openai मोड) के लिए कोई अतिरिक्त इंस्टॉल की ज़रूरत नहीं — बस एनवायरनमेंट वेरिएबल्स सेट करें और `embed_graph_tool` को `provider="openai"` पास करें:
 
 ```bash
 export CRG_OPENAI_BASE_URL=http://127.0.0.1:3000/v1     # या https://api.openai.com/v1

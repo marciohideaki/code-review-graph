@@ -72,7 +72,7 @@ def _resolve_repo_root(repo_root: Optional[str]) -> Optional[str]:
     1. Explicit ``repo_root`` passed by the MCP client (highest).
     2. ``--repo`` CLI flag passed to ``code-review-graph serve``
        (captured in ``_default_repo_root``).
-    3. None — the underlying impl will fall back to the server's cwd.
+    3. None: the underlying impl will fall back to the server's cwd.
 
     All MCP tools that accept ``repo_root`` should use this helper so
     ``serve --repo <X>`` applies consistently, including
@@ -101,7 +101,7 @@ async def build_or_update_graph_tool(
 ) -> dict:
     """Build or incrementally update the code knowledge graph.
 
-    Call this first to initialize the graph, or after making changes.
+    Call this first to initialise the graph, or after making changes.
     By default performs an incremental update (only changed files).
     Set full_rebuild=True to re-parse every file.
 
@@ -193,7 +193,7 @@ def get_impact_radius_tool(
     base: str = "HEAD~1",
     detail_level: str = "standard",
 ) -> dict:
-    """Analyze the blast radius of changed files in the codebase.
+    """Analyse the blast radius of changed files in the codebase.
 
     Shows which functions, classes, and files are impacted by changes.
     Auto-detects changed files from git if not specified.
@@ -330,7 +330,7 @@ async def embed_graph_tool(
 
     Runs the blocking sentence-transformers / Gemini / HTTP inference in a
     thread via ``asyncio.to_thread`` so the stdio event loop stays
-    responsive — without this wrapper, embedding a large graph would
+    responsive; without this wrapper, embedding a large graph would
     silently hang the MCP server on Windows. See: #46, #136.
 
     Args:
@@ -372,7 +372,7 @@ def get_docs_section_tool(
     section_name: str,
     repo_root: Optional[str] = None,
 ) -> dict:
-    """Get a specific section from the LLM-optimized documentation reference.
+    """Get a specific section from the LLM-optimised documentation reference.
 
     Returns only the requested section content for minimal token usage.
     Use this before answering any user question about the plugin.
@@ -575,9 +575,9 @@ async def detect_changes_tool(
 
     Primary tool for code review. Maps git diffs to affected functions,
     flows, communities, and test coverage gaps. Returns risk scores and
-    prioritized review items. Replaces get_review_context for change-aware reviews.
+    prioritised review items. Replaces get_review_context for change-aware reviews.
 
-    Offloaded to a thread via ``asyncio.to_thread`` — runs `git diff`
+    Offloaded to a thread via ``asyncio.to_thread``; runs `git diff`
     subprocesses and BFS traversals that can take several seconds on
     large repos. See: #46, #136.
 
@@ -675,7 +675,7 @@ async def generate_wiki_tool(
     Pages are written to .code-review-graph/wiki/ inside the repository.
     Only regenerates pages whose content has changed unless force=True.
 
-    Offloaded to a thread via ``asyncio.to_thread`` — on large graphs
+    Offloaded to a thread via ``asyncio.to_thread``; on large graphs
     the page-generation loop touches every community and issues many
     SQLite reads, which would block the MCP event loop. See: #46, #136.
 
@@ -792,7 +792,7 @@ def get_suggested_questions_tool(
 ) -> dict:
     """Auto-generate review questions from graph analysis.
 
-    Produces prioritized questions about: bridge nodes needing tests,
+    Produces prioritised questions about: bridge nodes needing tests,
     untested hub nodes, surprising cross-community coupling, thin
     communities, and untested hotspots.
 
@@ -931,8 +931,8 @@ def _apply_tool_filter(tools: str | None = None) -> None:
 
     When neither is set, all tools remain available.
 
-    This is useful for token-constrained environments: CRG exposes 28+
-    tools by default (~8k description tokens per LLM turn).  Filtering
+    This is useful for token-constrained environments: CRG exposes 30
+    tools by default (~8k description tokens per LLM turn). Filtering
     to a working set of 5-10 tools can reduce overhead by 70-85%.
 
     Example::
@@ -955,7 +955,7 @@ def _apply_tool_filter(tools: str | None = None) -> None:
     # FastMCP >=3 exposes tool enumeration via the async ``list_tools``
     # method.  ``_apply_tool_filter`` is typically called from
     # ``main()`` before the MCP event loop starts, but tests may invoke
-    # it from within a running event loop — in that case ``asyncio.run``
+    # it from within a running event loop; in that case ``asyncio.run``
     # raises ``RuntimeError``.  Fall back to running the coroutine on a
     # dedicated short-lived loop in a worker thread.  Earlier code path
     # relied on ``mcp._tool_manager._tools`` which is a private
@@ -993,7 +993,7 @@ def main(
 
     On Windows, Python 3.8+ defaults to ``ProactorEventLoop``, which
     interacts poorly with ``concurrent.futures.ProcessPoolExecutor``
-    (used by ``full_build``) over a stdio MCP transport — the combination
+    (used by ``full_build``) over a stdio MCP transport; the combination
     produces silent hangs on ``build_or_update_graph_tool`` and
     ``embed_graph_tool``. Switching to ``WindowsSelectorEventLoopPolicy``
     before fastmcp starts its loop avoids the deadlock.

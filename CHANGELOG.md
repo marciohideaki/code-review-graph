@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+- Documentation refreshed for multi-platform support, current MCP tool and language counts, schema/privacy references, generated instructions, VS Code extension copy, and README-visible diagrams.
+
 ## [2.3.3] - 2026-05-08
 
-Large additive release accumulated since v2.3.2 — 141 non-merge commits, 8 new languages/extensions, 5 new platform install targets, 6 new framework call resolvers, comprehensive Windows hardening, VS Code accessibility pass, and a full sweep of community PRs.
+Large additive release accumulated since v2.3.2: 141 non-merge commits, 8 new languages/extensions, 5 new platform install targets, 6 new framework call resolvers, comprehensive Windows hardening, VS Code accessibility pass, and a full sweep of community PRs.
 
 ### Added
 
@@ -52,21 +54,21 @@ Large additive release accumulated since v2.3.2 — 141 non-merge commits, 8 new
 #### Embeddings
 
 - **OpenAI-compatible embedding provider** (PR #321): pluggable provider supporting OpenAI, Azure OpenAI, and any OpenAI-API-compatible endpoint, with configurable batch size.
-- **Localized embedding READMEs**: provider docs translated for non-English users.
+- **Localised embedding READMEs**: provider docs translated for non-English users.
 
-#### Visualization, accessibility, and VS Code extension
+#### Visualisation, accessibility, and VS Code extension
 
 - **WCAG 2.1 AA contrast pass**: 4.5:1 minimum text contrast across the standalone HTML and VS Code webview.
-- **Distinct `d3.symbol` shapes per node kind**: colorblind-friendly differentiation in both the standalone visualization and the VS Code webview.
+- **Distinct `d3.symbol` shapes per node kind**: colour-blind-friendly differentiation in both the standalone visualisation and the VS Code webview.
 - **Keyboard navigation**: tab/arrow/enter/escape navigation across nodes, with focus styles and a skip-link to bypass the legend.
 - **ARIA roles and labels**: tooltip, detail panel, legend, search results, communities button, edge-pill keyboard activation, search input label.
 - **Help overlay**: interaction guide for both the standalone HTML and the keyboard-help overlay.
 - **Empty-state webview** in VS Code with a contextual depth slider and tooltip.
-- **Edge filter popover** in the VS Code toolbar — fixes density on narrow panels.
+- **Edge filter popover** in the VS Code toolbar: fixes density on narrow panels.
 - **Detail panel relocated to the left** so it no longer occludes top controls; close button restyled to match the toolbar.
 - **CONTAINS edge opacity** raised from 0.08 → 0.14 for visibility on dense graphs.
 - **GitHub Dark palette** unified across the VS Code extension.
-- **`IMPLEMENTS`, `TESTED_BY`, `DEPENDS_ON` edge types** rendered in the standalone HTML visualization.
+- **`IMPLEMENTS`, `TESTED_BY`, `DEPENDS_ON` edge types** rendered in the standalone HTML visualisation.
 
 ### Fixed
 
@@ -144,7 +146,7 @@ Large additive release accumulated since v2.3.2 — 141 non-merge commits, 8 new
 - `uvx --reinstall code-review-graph` or `pip install -U code-review-graph`.
 - Re-run `code-review-graph install` once after upgrading to pick up the JSONC-tolerant config writer and the corrected `cwd` / skills path in `.mcp.json`.
 - The `__version__` fix changes the User-Agent string emitted by cloud embedding providers from `code-review-graph/2.1.0` to `code-review-graph/2.3.3`. Anyone allow-listing the old User-Agent on a proxy needs to update their rule.
-- VS Code extension still ships separately — repackage and republish the `.vsix` if you want the v2.3.3 a11y improvements in the Marketplace build.
+- VS Code extension still ships separately: repackage and republish the `.vsix` if you want the v2.3.3 a11y improvements in the Marketplace build.
 
 ## [2.3.2] - 2026-04-14
 

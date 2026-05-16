@@ -60,10 +60,10 @@ uv run mypy code_review_graph/ --ignore-missing-imports --no-strict-optional
 code_review_graph/     # Core Python package
   parser.py            # Tree-sitter multi-language parser
   graph.py             # SQLite graph store
-  tools.py             # MCP tool implementations
+  tools/               # MCP tool implementation modules
   incremental.py       # Git diff + file watch logic
   embeddings.py        # Vector embedding support
-  visualization.py     # D3.js HTML generator
+  visualization.py     # D3.js HTML visualisation generator
   cli.py               # CLI entry point
   main.py              # MCP server entry point
 tests/                 # Test suite
@@ -82,6 +82,6 @@ tests/                 # Test suite
 - Use GitHub Issues: https://github.com/tirth8205/code-review-graph/issues
 - Include: Python version, OS, steps to reproduce, error output
 
-## License
+## Licence
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be licensed under the MIT Licence.
