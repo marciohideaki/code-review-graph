@@ -1,0 +1,7 @@
+schema_version: repository-contract/v1
+repository_id: 33df15da-5b04-410f-9717-c1d1375bdf56
+identity:
+  remotes:
+  - github.com/marciohideaki/code-review-graph
+capabilities:
+  manifest: null
